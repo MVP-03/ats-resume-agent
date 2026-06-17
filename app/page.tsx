@@ -251,64 +251,97 @@ function ResumePdfPreview({ data, onClose }: { data: FullResume; onClose: () => 
   );
 }
 
-// â”€â”€ small UI components â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── SVG icon system ─────────────────────────────────────────────────────────
+/* eslint-disable react/display-name */
+
+const I = {
+  home:    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+  grid:    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
+  folder:  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>,
+  plus:    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+  chevD:   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>,
+  chevR:   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>,
+  pen:     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+  uploadIc:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>,
+  chart:   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
+  sparkle: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z"/></svg>,
+  mail:    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>,
+  send:    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
+  saveIc:  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>,
+  copy:    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
+  check:   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>,
+  xmark:   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+  trash:   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>,
+  arrowR:  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+  menu:    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
+  link:    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
+  warn:    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+};
+
+// ── Micro-components ──────────────────────────────────────────────────────────
 
 function ScoreRing({ score }: { score: number }) {
-  const color = score >= 70 ? "#22c55e" : score >= 50 ? "#eab308" : "#ef4444";
-  const label = score >= 70 ? "Strong" : score >= 50 ? "Moderate" : "Weak";
+  const r = 52, circ = 2 * Math.PI * r, fill = (score / 100) * circ;
+  const col = score >= 70 ? "#10b981" : score >= 50 ? "#f59e0b" : "#f43f5e";
   return (
-    <div className="flex flex-col items-center gap-1">
-      <svg width="110" height="110" viewBox="0 0 110 110">
-        <circle cx="55" cy="55" r="46" fill="none" stroke="#1f2937" strokeWidth="11" />
-        <circle cx="55" cy="55" r="46" fill="none" stroke={color} strokeWidth="11"
-          strokeDasharray={`${(score / 100) * 289} 289`} strokeLinecap="round"
-          transform="rotate(-90 55 55)" />
-        <text x="55" y="51" textAnchor="middle" fill="white" fontSize="21" fontWeight="bold">{score}</text>
-        <text x="55" y="66" textAnchor="middle" fill="#9ca3af" fontSize="10">/100</text>
-      </svg>
-      <span style={{ color }} className="text-xs font-semibold">{label} Match</span>
+    <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:"8px" }}>
+      <div style={{ position:"relative" }}>
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle cx="65" cy="65" r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="10"/>
+          <circle cx="65" cy="65" r={r} fill="none" stroke={col} strokeWidth="10"
+            strokeDasharray={`${fill} ${circ}`} strokeLinecap="round"
+            transform="rotate(-90 65 65)" className="score-circle"
+            style={{ filter:`drop-shadow(0 0 8px ${col}80)` }}/>
+        </svg>
+        <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
+          <span style={{ fontSize:"26px", fontWeight:800, color:"#e2e8f0", lineHeight:1 }}>{score}</span>
+          <span style={{ fontSize:"11px", color:"var(--t2)", marginTop:"2px" }}>/ 100</span>
+        </div>
+      </div>
+      <span style={{ fontSize:"12px", fontWeight:600, color:col, letterSpacing:"0.03em" }}>
+        {score >= 70 ? "Strong" : score >= 50 ? "Moderate" : "Weak"} ATS Match
+      </span>
     </div>
   );
 }
 
-function MiniBar({ label, value }: { label: string; value: number }) {
-  const color = value >= 70 ? "bg-green-500" : value >= 50 ? "bg-yellow-500" : "bg-red-500";
+function MiniBar({ label, value, delay=0 }: { label:string; value:number; delay?:number }) {
+  const col = value >= 70 ? "#10b981" : value >= 50 ? "#f59e0b" : "#f43f5e";
   return (
     <div>
-      <div className="flex justify-between text-xs text-gray-400 mb-1">
-        <span>{label}</span><span className="font-mono">{value}%</span>
+      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"5px" }}>
+        <span style={{ fontSize:"12px", color:"var(--t2)" }}>{label}</span>
+        <span style={{ fontSize:"12px", fontWeight:600, color:col, fontFamily:"var(--font-geist-mono)" }}>{value}%</span>
       </div>
-      <div className="h-1.5 bg-gray-800 rounded-full">
-        <div className={`h-full rounded-full ${color}`} style={{ width: `${value}%` }} />
+      <div style={{ height:"5px", background:"rgba(255,255,255,0.05)", borderRadius:"99px", overflow:"hidden" }}>
+        <div className="animate-bar" style={{ height:"100%", width:`${value}%`, background:col, borderRadius:"99px", animationDelay:`${delay}ms`, boxShadow:`0 0 6px ${col}60` }}/>
       </div>
     </div>
   );
 }
 
-function Chip({ text, variant }: { text: string; variant: "green" | "red" }) {
-  return (
-    <span className={`inline-block px-2 py-0.5 rounded text-xs font-mono border
-      ${variant === "green" ? "bg-green-900/40 text-green-300 border-green-800" : "bg-red-900/40 text-red-300 border-red-800"}`}>
-      {text}
-    </span>
-  );
+function Chip({ text, variant }: { text:string; variant:"green"|"red" }) {
+  return <span className={variant === "green" ? "chip chip-green" : "chip chip-red"}>{text}</span>;
 }
 
-function StatusIcon({ status }: { status: "pass" | "warn" | "fail" }) {
-  if (status === "pass") return <span className="text-green-400 text-sm">âœ“</span>;
-  if (status === "warn") return <span className="text-yellow-400 text-sm">âš </span>;
-  return <span className="text-red-400 text-sm">âœ—</span>;
+function StatusIcon({ status }: { status:"pass"|"warn"|"fail" }) {
+  if (status === "pass") return <span style={{ color:"#10b981", display:"flex", alignItems:"center" }}>{I.check}</span>;
+  if (status === "warn") return <span style={{ color:"#f59e0b", display:"flex", alignItems:"center" }}>{I.warn}</span>;
+  return <span style={{ color:"#f43f5e", display:"flex", alignItems:"center" }}>{I.xmark}</span>;
 }
 
-const FLOW_STEPS: { id: Step; label: string; icon: string; desc: string }[] = [
-  { id: "build", label: "Build Resume", icon: "âœ¦", desc: "AI writes your resume" },
-  { id: "input", label: "Upload & Check", icon: "â†‘", desc: "Parse your PDF" },
-  { id: "score", label: "ATS Score", icon: "â—Ž", desc: "Keyword analysis" },
-  { id: "tailor", label: "AI Coach", icon: "âš¡", desc: "Suggestions & letters" },
+function sc(s: number) { return s >= 70 ? "#10b981" : s >= 50 ? "#f59e0b" : "#f43f5e"; }
+function ago(d: string) {
+  const days = Math.floor((Date.now() - new Date(d).getTime()) / 86400000);
+  return days === 0 ? "Today" : days === 1 ? "Yesterday" : days < 7 ? `${days}d ago` : days < 30 ? `${Math.floor(days/7)}w ago` : `${Math.floor(days/30)}mo`;
+}
+
+const FLOW_STEPS: { id: Step; label: string; icon: React.ReactNode; desc: string }[] = [
+  { id:"build",  label:"Build",  icon:I.pen,      desc:"AI writes your resume" },
+  { id:"input",  label:"Upload", icon:I.uploadIc, desc:"Parse your PDF" },
+  { id:"score",  label:"Score",  icon:I.chart,    desc:"ATS analysis" },
+  { id:"tailor", label:"Coach",  icon:I.sparkle,  desc:"AI suggestions" },
 ];
-
-// â”€â”€ main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
 export default function Home() {
   const [step, setStep] = useState<Step>("home");
   const [tailorTab, setTailorTab] = useState<"coach" | "cover" | "hr">("coach");
@@ -574,104 +607,102 @@ export default function Home() {
     return <ResumePdfPreview data={fullResume} onClose={() => setFullResume(null)} />;
   }
 
-  const scoreColor = (s: number) => s >= 70 ? "#22c55e" : s >= 50 ? "#eab308" : "#ef4444";
+  const sc = (s: number) => s >= 70 ? "#22c55e" : s >= 50 ? "#eab308" : "#ef4444";
+
 
   return (
-    <div className="min-h-screen flex" style={{ background: "#070711" }}>
+    <div style={{ minHeight:"100vh", display:"flex", background:"var(--bg)" }}>
 
-      {/* â”€â”€ Sidebar â”€â”€ */}
-      <aside
-        className="flex-shrink-0 flex flex-col overflow-hidden border-r transition-all duration-300"
-        style={{
-          width: sidebarOpen ? "240px" : "0px",
-          background: "#0c0c1a",
-          borderColor: "rgba(255,255,255,0.06)",
-          minWidth: sidebarOpen ? "240px" : "0px",
-        }}
-      >
+      {/* SIDEBAR */}
+      <aside style={{
+        width: sidebarOpen ? "224px" : "0px", minWidth: sidebarOpen ? "224px" : "0px",
+        flexShrink: 0, display:"flex", flexDirection:"column",
+        background:"var(--s1)", borderRight:"1px solid var(--border)",
+        overflow:"hidden", transition:"width 0.25s ease, min-width 0.25s ease",
+      }}>
         {sidebarOpen && (
           <>
-            {/* Sidebar logo */}
-            <div className="px-4 py-4 border-b flex items-center gap-2.5" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-                style={{ background: "linear-gradient(135deg,#6366f1,#a855f7)" }}>R</div>
-              <span className="text-white font-semibold text-sm">ResumeAI</span>
+            {/* Logo */}
+            <div style={{ padding:"16px 16px 12px", borderBottom:"1px solid var(--border)", display:"flex", alignItems:"center", gap:"10px" }}>
+              <div style={{ width:"28px", height:"28px", borderRadius:"8px", background:"linear-gradient(135deg,var(--accent),var(--accent-2))", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:800, fontSize:"13px", flexShrink:0 }}>R</div>
+              <span style={{ fontWeight:700, fontSize:"14px", color:"var(--t1)" }}>ResumeAI</span>
             </div>
 
-            {/* New application */}
-            <div className="px-3 py-3">
-              <button onClick={reset}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-white transition-all hover:opacity-90"
-                style={{ background: "linear-gradient(135deg,#6366f1,#a855f7)" }}>
-                <span className="text-base">+</span> New Application
+            {/* Main Navigation */}
+            <div style={{ padding:"10px 8px 6px" }}>
+              <button onClick={reset} className={`nav-item${step === "home" ? " active" : ""}`}>
+                {I.home} Dashboard
               </button>
+              <div style={{ marginTop:"2px" }}>
+                <button onClick={() => setStep("tracker")} className={`nav-item${step === "tracker" ? " active" : ""}`} style={{ color: step === "tracker" ? undefined : "#10b981" }}>
+                  {I.grid}
+                  <span style={{ flex:1 }}>Application Tracker</span>
+                  <span style={{ fontSize:"9px", fontWeight:700, padding:"2px 6px", borderRadius:"99px", background:"rgba(16,185,129,0.15)", color:"#10b981", border:"1px solid rgba(16,185,129,0.25)" }}>NEW</span>
+                </button>
+              </div>
             </div>
+
+            <div style={{ height:"1px", background:"var(--border)", margin:"4px 10px 8px" }} />
 
             {/* Folders */}
-            <div className="px-3 pb-1 flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.3)" }}>Applications</span>
-              <button onClick={() => setShowNewFolder(true)}
-                className="text-xs px-2 py-0.5 rounded-md transition-colors hover:text-white"
-                style={{ color: "rgba(255,255,255,0.4)", background: "rgba(255,255,255,0.05)" }}>+ Folder</button>
+            <div style={{ padding:"0 10px 6px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+              <span style={{ fontSize:"10px", fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color:"var(--t3)" }}>Folders</span>
+              <button onClick={() => setShowNewFolder(true)} style={{ fontSize:"11px", color:"var(--accent)", background:"none", border:"none", cursor:"pointer" }}>+ New</button>
             </div>
 
             {showNewFolder && (
-              <div className="mx-3 mb-2 flex gap-1">
+              <div style={{ margin:"0 8px 8px", display:"flex", gap:"4px" }}>
                 <input autoFocus value={newFolderName}
                   onChange={(e) => setNewFolderName(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") handleCreateFolder(); if (e.key === "Escape") setShowNewFolder(false); }}
-                  placeholder="Folder name..."
-                  className="flex-1 rounded-lg px-2 py-1.5 text-xs text-gray-200 focus:outline-none"
-                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(99,102,241,0.5)" }} />
-                <button onClick={handleCreateFolder} className="text-indigo-400 text-sm px-1.5 hover:text-indigo-300">âœ“</button>
+                  placeholder="Folder name..." className="field" style={{ padding:"6px 10px", fontSize:"12px" }} />
+                <button onClick={handleCreateFolder} className="btn btn-primary" style={{ padding:"6px 12px", fontSize:"12px" }}>OK</button>
               </div>
             )}
 
-            <div className="flex-1 overflow-y-auto px-2 space-y-0.5 pb-4">
+            <div style={{ flex:1, overflowY:"auto", padding:"0 8px 8px" }}>
               {folders.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-xs mb-2" style={{ color: "rgba(255,255,255,0.25)" }}>No folders yet.</p>
-                  <button onClick={() => setShowNewFolder(true)} className="text-xs text-indigo-400 hover:text-indigo-300">Create your first folder â†’</button>
+                <div style={{ textAlign:"center", padding:"24px 8px" }}>
+                  <div style={{ color:"var(--t3)", fontSize:"12px", marginBottom:"6px" }}>No folders yet</div>
+                  <button onClick={() => setShowNewFolder(true)} style={{ fontSize:"11px", color:"var(--accent)", background:"none", border:"none", cursor:"pointer" }}>Create one</button>
                 </div>
               ) : (
                 folders.map((folder) => (
                   <div key={folder.id}>
-                    <button
-                      onClick={() => setSelectedFolder(selectedFolder === folder.id ? null : folder.id)}
-                      className="w-full text-left px-3 py-2 rounded-lg text-xs flex items-center justify-between transition-colors"
-                      style={{
-                        color: selectedFolder === folder.id ? "#a5b4fc" : "rgba(255,255,255,0.5)",
-                        background: selectedFolder === folder.id ? "rgba(99,102,241,0.12)" : "transparent",
-                      }}
-                    >
-                      <span className="flex items-center gap-2 truncate">
-                        <span style={{ opacity: 0.6 }}>â–¤</span>
-                        <span className="truncate font-medium">{folder.name}</span>
+                    <button onClick={() => setSelectedFolder(selectedFolder === folder.id ? null : folder.id)}
+                      style={{ width:"100%", textAlign:"left", padding:"6px 8px", borderRadius:"8px", fontSize:"12px",
+                        display:"flex", alignItems:"center", justifyContent:"space-between", gap:"6px",
+                        background: selectedFolder === folder.id ? "rgba(124,58,237,0.1)" : "transparent",
+                        color: selectedFolder === folder.id ? "#c4b5fd" : "var(--t2)",
+                        border:"none", cursor:"pointer" }}>
+                      <span style={{ display:"flex", alignItems:"center", gap:"6px", overflow:"hidden" }}>
+                        <span style={{ flexShrink:0, opacity:0.7 }}>{I.folder}</span>
+                        <span style={{ overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontWeight:500 }}>{folder.name}</span>
                       </span>
-                      <span style={{ opacity: 0.4, fontSize: "10px" }}>{selectedFolder === folder.id ? "â–¾" : "â–¸"}</span>
+                      <span style={{ flexShrink:0, opacity:0.5 }}>{selectedFolder === folder.id ? I.chevD : I.chevR}</span>
                     </button>
-
                     {selectedFolder === folder.id && (
-                      <div className="ml-3 mt-0.5 space-y-0.5">
+                      <div style={{ marginLeft:"8px", marginTop:"2px" }}>
                         {folderResumes.length === 0 ? (
-                          <p className="px-3 py-2 text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>No saved resumes</p>
+                          <p style={{ padding:"8px 10px", fontSize:"11px", color:"var(--t3)" }}>No saved resumes</p>
                         ) : (
                           folderResumes.map((r) => (
-                            <div key={r.id} className="flex items-center gap-1 group rounded-lg overflow-hidden"
-                              style={{ background: "rgba(255,255,255,0.02)" }}>
-                              <button onClick={() => loadResume(r)} className="flex-1 text-left px-3 py-2 min-w-0">
-                                <p className="text-xs font-medium truncate" style={{ color: "rgba(255,255,255,0.7)" }}>{r.label}</p>
-                                <div className="flex items-center gap-2 mt-0.5">
+                            <div key={r.id} style={{ display:"flex", alignItems:"center" }}>
+                              <button onClick={() => loadResume(r)} style={{ flex:1, textAlign:"left", padding:"6px 8px", background:"none", border:"none", cursor:"pointer" }}>
+                                <p style={{ fontSize:"11px", fontWeight:500, color:"rgba(255,255,255,0.65)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{r.label}</p>
+                                <div style={{ display:"flex", alignItems:"center", gap:"6px", marginTop:"2px" }}>
                                   {r.ats_score != null && (
-                                    <span className="text-xs font-bold" style={{ color: scoreColor(r.ats_score) }}>{r.ats_score}</span>
+                                    <span style={{ fontSize:"11px", fontWeight:700, color:sc(r.ats_score) }}>{r.ats_score}</span>
                                   )}
-                                  <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
-                                    {new Date(r.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                                  <span style={{ fontSize:"10px", color:"var(--t3)" }}>
+                                    {new Date(r.created_at).toLocaleDateString("en-US", { month:"short", day:"numeric" })}
                                   </span>
                                 </div>
                               </button>
                               <button onClick={() => handleDeleteResume(r.id)}
-                                className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-400 text-xs px-2 py-2 transition-opacity">âœ•</button>
+                                style={{ padding:"4px 8px", color:"var(--red)", background:"none", border:"none", cursor:"pointer" }}>
+                                {I.trash}
+                              </button>
                             </div>
                           ))
                         )}
@@ -682,58 +713,47 @@ export default function Home() {
               )}
             </div>
 
-            {/* Sidebar footer */}
-            {/* Sidebar footer */}
-            <div className="px-3 pb-4 pt-2 border-t space-y-0.5" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
-              <button onClick={() => setStep("home")}
-                className="w-full text-left px-3 py-2 rounded-lg text-xs transition-colors flex items-center gap-2 hover:text-white"
-                style={{ color: step === "home" ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.35)" }}>
-                <span>&#8962;</span> Dashboard
-              </button>
-              <button onClick={() => setStep("tracker")}
-                className="w-full text-left px-3 py-2 rounded-lg text-xs transition-colors flex items-center gap-2 hover:text-white"
-                style={{ color: step === "tracker" ? "#4ade80" : "rgba(255,255,255,0.35)" }}>
-                <span>&#9645;</span> Tracker
+            <div style={{ padding:"10px", borderTop:"1px solid var(--border)" }}>
+              <button onClick={reset} className="btn btn-primary" style={{ width:"100%", padding:"9px", fontSize:"13px" }}>
+                {I.plus} New Application
               </button>
             </div>
           </>
         )}
       </aside>
 
-      {/* â”€â”€ Main area â”€â”€ */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* MAIN */}
+      <div style={{ flex:1, display:"flex", flexDirection:"column", minWidth:0 }}>
 
-        {/* â”€â”€ Header â”€â”€ */}
-        <header className="flex-shrink-0 flex items-center justify-between px-5 py-3 border-b"
-          style={{ background: "rgba(7,7,17,0.8)", borderColor: "rgba(255,255,255,0.06)", backdropFilter: "blur(12px)" }}>
-          <div className="flex items-center gap-3">
+        {/* HEADER */}
+        <header style={{ flexShrink:0, display:"flex", alignItems:"center", justifyContent:"space-between",
+          padding:"0 20px", height:"52px", background:"rgba(6,6,14,0.9)",
+          borderBottom:"1px solid var(--border)", backdropFilter:"blur(12px)",
+          position:"sticky", top:0, zIndex:10 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:"12px" }}>
             <button onClick={() => setSidebarOpen((o) => !o)}
-              className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:text-white"
-              style={{ color: "rgba(255,255,255,0.35)", background: "rgba(255,255,255,0.04)" }}>
-              â˜°
+              style={{ width:"32px", height:"32px", borderRadius:"8px", display:"flex", alignItems:"center", justifyContent:"center",
+                background:"rgba(255,255,255,0.04)", border:"1px solid var(--border)", color:"var(--t2)", cursor:"pointer" }}>
+              {I.menu}
             </button>
             {step !== "home" && step !== "tracker" && (
-              <div className="flex items-center gap-1">
+              <div style={{ display:"flex", alignItems:"center", gap:"4px" }}>
                 {FLOW_STEPS.map((s, i) => {
                   const isActive = step === s.id;
                   const isDone = flowStepIdx > i;
                   return (
-                    <div key={s.id} className="flex items-center gap-1">
-                      <button
-                        onClick={() => { if (isDone || isActive) setStep(s.id); }}
-                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all"
-                        style={{
-                          background: isActive ? "rgba(99,102,241,0.2)" : isDone ? "rgba(255,255,255,0.04)" : "transparent",
-                          color: isActive ? "#a5b4fc" : isDone ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.2)",
-                          border: isActive ? "1px solid rgba(99,102,241,0.4)" : "1px solid transparent",
-                          cursor: (isDone || isActive) ? "pointer" : "default",
-                        }}
-                      >
-                        <span style={{ fontSize: "10px" }}>{isDone ? "âœ“" : s.icon}</span>
-                        <span className="hidden sm:block">{s.label}</span>
+                    <div key={s.id} style={{ display:"flex", alignItems:"center", gap:"4px" }}>
+                      <button onClick={() => { if (isDone || isActive) setStep(s.id); }}
+                        style={{ display:"flex", alignItems:"center", gap:"5px", padding:"4px 10px", borderRadius:"8px",
+                          fontSize:"12px", fontWeight:600, border:"none", cursor:(isDone || isActive) ? "pointer" : "default",
+                          background: isActive ? "rgba(124,58,237,0.18)" : isDone ? "rgba(255,255,255,0.04)" : "transparent",
+                          color: isActive ? "#c4b5fd" : isDone ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.18)",
+                          boxShadow: isActive ? "inset 0 0 0 1px rgba(124,58,237,0.4)" : "none" }}>
+                        <span style={{ display:"flex" }}>{isDone ? I.check : s.icon}</span>
+                        <span>{s.label}</span>
                       </button>
                       {i < FLOW_STEPS.length - 1 && (
-                        <div className="w-4 h-px" style={{ background: isDone ? "rgba(99,102,241,0.4)" : "rgba(255,255,255,0.08)" }} />
+                        <div style={{ width:"16px", height:"1px", background: isDone ? "rgba(124,58,237,0.35)" : "rgba(255,255,255,0.07)" }} />
                       )}
                     </div>
                   );
@@ -741,185 +761,121 @@ export default function Home() {
               </div>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
             {canSave && step !== "home" && step !== "tracker" && (
-              <button onClick={() => setShowSaveModal(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:opacity-90"
-                style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.3)", color: "#a5b4fc" }}>
-                â†“ Save
+              <button onClick={() => setShowSaveModal(true)} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>
+                {I.saveIc} Save
               </button>
             )}
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-              style={{ background: "linear-gradient(135deg,#6366f1,#a855f7)" }}>P</div>
+            <div style={{ width:"30px", height:"30px", borderRadius:"50%", background:"linear-gradient(135deg,var(--accent),var(--accent-2))", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"12px", fontWeight:700, color:"#fff" }}>P</div>
           </div>
         </header>
 
-        {/* â”€â”€ Loading overlay â”€â”€ */}
+        {/* LOADING */}
         {loading && (
-          <div className="fixed inset-0 z-40 flex items-center justify-center" style={{ background: "rgba(7,7,17,0.85)", backdropFilter: "blur(8px)" }}>
-            <div className="flex flex-col items-center gap-4">
-              <div className="relative w-16 h-16">
-                <svg className="animate-spin w-16 h-16" viewBox="0 0 64 64">
-                  <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(99,102,241,0.15)" strokeWidth="4" />
-                  <circle cx="32" cy="32" r="28" fill="none" stroke="url(#spin-grad)" strokeWidth="4"
-                    strokeDasharray="60 116" strokeLinecap="round" transform="rotate(-90 32 32)" />
-                  <defs>
-                    <linearGradient id="spin-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#6366f1" />
-                      <stop offset="100%" stopColor="#a855f7" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center text-lg">âš¡</div>
-              </div>
-              <p className="text-white font-medium text-sm">{loadingMsg}</p>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>This takes a few seconds</p>
+          <div style={{ position:"fixed", inset:0, background:"rgba(6,6,14,0.75)", backdropFilter:"blur(8px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:100 }}>
+            <div className="card" style={{ padding:"32px 40px", textAlign:"center" }}>
+              <div style={{ width:"36px", height:"36px", borderRadius:"50%", border:"3px solid rgba(124,58,237,0.2)", borderTopColor:"var(--accent)", margin:"0 auto 16px" }} className="animate-spin" />
+              <p style={{ color:"var(--t1)", fontSize:"14px", fontWeight:600 }}>{loadingMsg || "Processing..."}</p>
             </div>
           </div>
         )}
 
-        {/* â”€â”€ Error banner â”€â”€ */}
+        {/* ERROR */}
         {error && (
-          <div className="mx-4 mt-4 p-3 rounded-xl flex gap-3 items-start"
-            style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)" }}>
-            <span className="text-red-400 text-sm flex-shrink-0">âœ—</span>
-            <span className="text-red-300 text-sm">{error}</span>
-            <button onClick={() => setError("")} className="ml-auto text-red-500 hover:text-red-300 text-xs">âœ•</button>
+          <div style={{ margin:"16px 20px 0", padding:"12px 16px", borderRadius:"10px", background:"rgba(244,63,94,0.08)", border:"1px solid rgba(244,63,94,0.25)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <span style={{ fontSize:"13px", color:"var(--red)" }}>{error}</span>
+            <button onClick={() => setError("")} style={{ color:"var(--t2)", background:"none", border:"none", cursor:"pointer", display:"flex" }}>{I.xmark}</button>
           </div>
         )}
 
-        {/* â”€â”€ Page content â”€â”€ */}
-        <main className="flex-1 overflow-y-auto">
+        {/* CONTENT */}
+        <main style={{ flex:1, overflowY:"auto" }}>
 
-          {/* â”€â”€ HOME DASHBOARD â”€â”€ */}
+          {/* HOME */}
           {step === "home" && (
-            <div className="max-w-5xl mx-auto px-5 py-8 space-y-8">
-              {/* Hero */}
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold"
-                  style={{ background: "linear-gradient(135deg,#e2e8f0,#a5b4fc,#c084fc)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  Your AI Resume Command Center
+            <div style={{ maxWidth:"860px", margin:"0 auto", padding:"36px 24px", display:"flex", flexDirection:"column", gap:"28px" }} className="animate-fadeUp dot-grid">
+              <div>
+                <span className="tag tag-violet" style={{ marginBottom:"12px", display:"inline-flex" }}>AI-Powered ATS Agent</span>
+                <h1 style={{ fontSize:"34px", fontWeight:800, lineHeight:1.1, marginBottom:"10px" }} className="gradient-text">
+                  Land your next role faster.
                 </h1>
-                <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
-                  Build Â· Score Â· Tailor Â· Cover Letter â€” everything in one place.
+                <p style={{ fontSize:"15px", color:"var(--t2)", maxWidth:"480px", lineHeight:1.6 }}>
+                  Build, score, and tailor your resume to beat ATS systems. Track every application in one Kanban board.
                 </p>
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { label: "Folders Created", value: folders.length, icon: "â–¤", color: "#6366f1" },
-                  { label: "Saved Applications", value: folderResumes.length, icon: "â—Ž", color: "#a855f7" },
-                  { label: "AI Features", value: 4, icon: "âš¡", color: "#22c55e" },
-                  { label: "ATS Accuracy", value: "98%", icon: "âœ¦", color: "#eab308" },
-                ].map((stat) => (
-                  <div key={stat.label} className="rounded-2xl p-5 space-y-3"
-                    style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base"
-                      style={{ background: `${stat.color}18`, color: stat.color }}>
-                      {stat.icon}
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-white">{stat.value}</p>
-                      <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{stat.label}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Start CTA + Tracker */}
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="rounded-2xl p-6 flex flex-col justify-between gap-4"
-                  style={{ background: "linear-gradient(135deg,rgba(99,102,241,0.15),rgba(168,85,247,0.1))", border: "1px solid rgba(99,102,241,0.25)" }}>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px" }}>
+                <div className="card" style={{ padding:"24px", display:"flex", flexDirection:"column", gap:"20px", background:"linear-gradient(135deg,rgba(124,58,237,0.15),rgba(79,70,229,0.08))", borderColor:"rgba(124,58,237,0.3)" }}>
                   <div>
-                    <h2 className="text-lg font-bold text-white">Start a new application</h2>
-                    <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.45)" }}>
-                      Upload your resume, get ATS scored, AI coached, and generate a cover letter.
-                    </p>
+                    <div style={{ width:"40px", height:"40px", borderRadius:"10px", background:"rgba(124,58,237,0.2)", border:"1px solid rgba(124,58,237,0.3)", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:"14px" }}>
+                      {I.sparkle}
+                    </div>
+                    <h2 style={{ fontSize:"16px", fontWeight:700, color:"var(--t1)", marginBottom:"6px" }}>Start a new application</h2>
+                    <p style={{ fontSize:"13px", color:"var(--t2)", lineHeight:1.55 }}>Upload your resume, get ATS scored, AI coached, and generate a cover letter.</p>
                   </div>
-                  <div className="flex gap-3">
-                    <button onClick={() => setStep("input")}
-                      className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-                      style={{ background: "linear-gradient(135deg,#6366f1,#a855f7)" }}>
-                      Upload Resume &rarr;
+                  <div style={{ display:"flex", gap:"10px" }}>
+                    <button onClick={() => setStep("input")} className="btn btn-primary" style={{ flex:1, padding:"10px" }}>
+                      Upload Resume
                     </button>
-                    <button onClick={() => setStep("build")}
-                      className="px-4 py-2.5 rounded-xl text-sm font-medium transition-colors"
-                      style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.6)" }}>
-                      Build
-                    </button>
+                    <button onClick={() => setStep("build")} className="btn btn-ghost" style={{ padding:"10px 14px" }}>Build</button>
                   </div>
                 </div>
 
-                <button onClick={() => setStep("tracker")}
-                  className="rounded-2xl p-6 text-left flex flex-col justify-between gap-4 transition-all hover:scale-[1.02] group"
-                  style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                  <div className="flex items-start justify-between">
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
-                      style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}>
-                      &#x2B21;
+                <button onClick={() => setStep("tracker")} className="card card-hover" style={{ padding:"24px", textAlign:"left", display:"flex", flexDirection:"column", gap:"16px", cursor:"pointer", border:"1px solid rgba(16,185,129,0.25)", background:"var(--s1)" }}>
+                  <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between" }}>
+                    <div style={{ width:"40px", height:"40px", borderRadius:"10px", background:"rgba(16,185,129,0.1)", border:"1px solid rgba(16,185,129,0.2)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      {I.grid}
                     </div>
-                    <span className="text-xs px-2.5 py-1 rounded-full font-medium"
-                      style={{ background: "rgba(34,197,94,0.1)", color: "#4ade80", border: "1px solid rgba(34,197,94,0.2)" }}>New</span>
+                    <span className="tag tag-green">Kanban</span>
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-white group-hover:text-green-300 transition-colors">Application Tracker</h2>
-                    <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>
-                      Kanban board — Wishlist to Offer. Drag cards between stages, track salaries, add notes.
-                    </p>
+                    <h2 style={{ fontSize:"16px", fontWeight:700, color:"var(--t1)", marginBottom:"6px" }}>Application Tracker</h2>
+                    <p style={{ fontSize:"13px", color:"var(--t2)", lineHeight:1.55 }}>Drag and drop your applications across stages. Wishlist to Offer. Track salaries, scores, notes.</p>
                   </div>
-                  <div className="flex gap-1.5">
+                  <div style={{ display:"flex", gap:"6px" }}>
                     {["Wishlist","Applied","Interview","Offer"].map((s) => (
-                      <span key={s} className="text-xs px-2 py-0.5 rounded-full"
-                        style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.4)" }}>{s}</span>
+                      <span key={s} className="chip chip-gray" style={{ fontSize:"10px" }}>{s}</span>
                     ))}
                   </div>
                 </button>
               </div>
-              {/* Process steps */}
+
               <div>
-                <h3 className="text-sm font-semibold mb-4" style={{ color: "rgba(255,255,255,0.5)" }}>HOW IT WORKS</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <p style={{ fontSize:"10px", fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color:"var(--t3)", marginBottom:"14px" }}>How it works</p>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"10px" }}>
                   {FLOW_STEPS.map((s, i) => (
-                    <button key={s.id} onClick={() => setStep(s.id)}
-                      className="text-left rounded-2xl p-4 space-y-3 transition-all hover:scale-[1.02] group"
-                      style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                      <div className="flex items-center justify-between">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
-                          style={{ background: "rgba(99,102,241,0.15)", color: "#a5b4fc" }}>{s.icon}</div>
-                        <span className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>0{i + 1}</span>
+                    <button key={s.id} onClick={() => setStep(s.id)} className="card card-hover" style={{ padding:"16px", textAlign:"left", cursor:"pointer" }}>
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"12px" }}>
+                        <div style={{ width:"32px", height:"32px", borderRadius:"8px", background:"rgba(124,58,237,0.12)", display:"flex", alignItems:"center", justifyContent:"center" }}>{s.icon}</div>
+                        <span style={{ fontSize:"10px", color:"var(--t3)", fontFamily:"var(--font-geist-mono)" }}>0{i + 1}</span>
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors">{s.label}</p>
-                        <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{s.desc}</p>
-                      </div>
+                      <p style={{ fontSize:"13px", fontWeight:600, color:"var(--t1)", marginBottom:"4px" }}>{s.label}</p>
+                      <p style={{ fontSize:"11px", color:"var(--t2)" }}>{s.desc}</p>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Recent activity */}
               {folders.length > 0 && (
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.5)" }}>RECENT FOLDERS</h3>
-                    <button onClick={() => setShowNewFolder(true)} className="text-xs text-indigo-400 hover:text-indigo-300">+ New folder</button>
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"14px" }}>
+                    <p style={{ fontSize:"10px", fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color:"var(--t3)" }}>Recent Folders</p>
+                    <button onClick={() => setShowNewFolder(true)} style={{ fontSize:"12px", color:"var(--accent)", background:"none", border:"none", cursor:"pointer" }}>+ New folder</button>
                   </div>
-                  <div className="grid md:grid-cols-2 gap-3">
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"10px" }}>
                     {folders.slice(0, 4).map((folder) => (
                       <button key={folder.id}
                         onClick={() => { setSelectedFolder(folder.id); setSidebarOpen(true); }}
-                        className="text-left rounded-2xl p-4 flex items-center gap-4 transition-all hover:scale-[1.01]"
-                        style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-                          style={{ background: "rgba(99,102,241,0.1)" }}>â–¤</div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-white truncate">{folder.name}</p>
-                          <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
-                            {new Date(folder.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        className="card card-hover" style={{ padding:"14px 16px", textAlign:"left", display:"flex", alignItems:"center", gap:"12px", cursor:"pointer" }}>
+                        <div style={{ width:"36px", height:"36px", borderRadius:"8px", background:"rgba(124,58,237,0.1)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{I.folder}</div>
+                        <div style={{ minWidth:0 }}>
+                          <p style={{ fontSize:"13px", fontWeight:600, color:"var(--t1)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{folder.name}</p>
+                          <p style={{ fontSize:"11px", color:"var(--t3)", marginTop:"2px" }}>
+                            {new Date(folder.created_at).toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" })}
                           </p>
                         </div>
-                        <span className="ml-auto text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>â†’</span>
+                        <span style={{ marginLeft:"auto", color:"var(--t3)", display:"flex" }}>{I.arrowR}</span>
                       </button>
                     ))}
                   </div>
@@ -928,302 +884,239 @@ export default function Home() {
             </div>
           )}
 
-
-          {/* -- TRACKER STEP -- */}
+          {/* TRACKER */}
           {step === "tracker" && (
-            <div className="flex flex-col" style={{ height: "calc(100vh - 56px)" }}>
+            <div style={{ height:"calc(100vh - 52px)", display:"flex", flexDirection:"column" }}>
               <TrackerView onBack={() => setStep("home")} />
             </div>
           )}
 
-          {/* â”€â”€ Wrapper for flow steps â”€â”€ */}
+          {/* FLOW STEPS */}
           {step !== "home" && step !== "tracker" && (
-            <div className="max-w-4xl mx-auto px-5 py-8 space-y-6">{/* â”€â”€ STEP 1: BUILD â”€â”€ */}
+            <div style={{ maxWidth:"900px", margin:"0 auto", padding:"32px 24px", display:"flex", flexDirection:"column", gap:"20px" }}>
+
+              {/* BUILD */}
               {step === "build" && (
-                <div className="space-y-6">
-                  <div className="flex items-start justify-between">
+                <div style={{ display:"flex", flexDirection:"column", gap:"20px" }} className="animate-fadeUp">
+                  <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between" }}>
                     <div>
-                      <h2 className="text-2xl font-bold text-white">Build Your Resume</h2>
-                      <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>Fill in your details â€” AI writes a fully ATS-optimized resume.</p>
+                      <h2 style={{ fontSize:"22px", fontWeight:800, color:"var(--t1)", marginBottom:"4px" }}>Build Your Resume</h2>
+                      <p style={{ fontSize:"13px", color:"var(--t2)" }}>Fill in your details — AI writes a fully ATS-optimized resume.</p>
                     </div>
-                    <button onClick={() => setStep("home")} className="text-xs transition-colors" style={{ color: "rgba(255,255,255,0.3)" }}>â† Home</button>
+                    <button onClick={() => setStep("home")} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
                   </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-4">
-                      <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <h3 className="text-sm font-semibold text-white">Contact Info</h3>
-                        {[
-                          { key: "name", label: "Full Name *", ph: "Jane Smith" },
-                          { key: "email", label: "Email *", ph: "jane@email.com" },
-                          { key: "phone", label: "Phone", ph: "+1 (555) 123-4567" },
-                          { key: "linkedin", label: "LinkedIn URL", ph: "linkedin.com/in/janesmith" },
-                        ].map(({ key, label, ph }) => (
-                          <div key={key}>
-                            <label className="text-xs block mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>{label}</label>
-                            <input value={form[key as keyof typeof form]} onChange={setF(key as keyof typeof form)}
-                              placeholder={ph}
-                              className="w-full rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none transition-colors"
-                              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-                              onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.6)"}
-                              onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"} />
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px" }}>
+                    <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
+                      <div className="card" style={{ padding:"18px" }}>
+                        <p style={{ fontSize:"10px", fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--t3)", marginBottom:"12px" }}>Contact Info</p>
+                        <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
+                          {([
+                            { key:"name" as const, label:"Full Name *", ph:"Jane Smith" },
+                            { key:"email" as const, label:"Email *", ph:"jane@email.com" },
+                            { key:"phone" as const, label:"Phone", ph:"+1 (555) 123-4567" },
+                            { key:"linkedin" as const, label:"LinkedIn URL", ph:"linkedin.com/in/janesmith" },
+                          ]).map(({ key, label, ph }) => (
+                            <div key={key}>
+                              <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>{label}</label>
+                              <input value={form[key]} onChange={setF(key)} placeholder={ph} className="field" style={{ padding:"8px 12px" }} />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="card" style={{ padding:"18px" }}>
+                        <p style={{ fontSize:"10px", fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--t3)", marginBottom:"12px" }}>Target Role</p>
+                        <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
+                          <div>
+                            <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Job Title</label>
+                            <input value={form.jobTitle} onChange={setF("jobTitle")} placeholder="Senior Software Engineer" className="field" style={{ padding:"8px 12px" }} />
                           </div>
-                        ))}
-                      </div>
-
-                      <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <h3 className="text-sm font-semibold text-white">Target Role</h3>
-                        <div>
-                          <label className="text-xs block mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>Job Title</label>
-                          <input value={form.jobTitle} onChange={setF("jobTitle")} placeholder="Senior Software Engineer"
-                            className="w-full rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none"
-                            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-                            onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.6)"}
-                            onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"} />
-                        </div>
-                        <div>
-                          <label className="text-xs block mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>Job Description</label>
-                          <textarea value={form.jobDescription} onChange={setF("jobDescription")}
-                            placeholder="Paste the job description here..." rows={4}
-                            className="w-full rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none resize-none"
-                            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-                            onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.6)"}
-                            onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"} />
+                          <div>
+                            <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Job Description</label>
+                            <textarea value={form.jobDescription} onChange={setF("jobDescription")} placeholder="Paste the job description here..." rows={5} className="field" style={{ padding:"8px 12px", resize:"vertical" }} />
+                          </div>
                         </div>
                       </div>
-
-                      <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <label className="text-xs block mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>Education</label>
-                        <textarea value={form.education} onChange={setF("education")}
-                          placeholder={"B.Sc. Computer Science | University of Toronto | 2021"} rows={2}
-                          className="w-full rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none resize-none"
-                          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-                          onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.6)"}
-                          onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"} />
+                      <div className="card" style={{ padding:"18px" }}>
+                        <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Education</label>
+                        <textarea value={form.education} onChange={setF("education")} placeholder="B.Sc. Computer Science | University of Toronto | 2021" rows={2} className="field" style={{ padding:"8px 12px", resize:"vertical" }} />
                       </div>
                     </div>
-
-                    <div className="space-y-4">
-                      <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <label className="text-xs block mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>Work Experience * <span style={{ color: "rgba(255,255,255,0.2)" }}>(roles, dates, what you did)</span></label>
+                    <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
+                      <div className="card" style={{ padding:"18px" }}>
+                        <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Work Experience *</label>
+                        <p style={{ fontSize:"11px", color:"var(--t3)", marginBottom:"8px" }}>roles, dates, what you did</p>
                         <textarea value={form.experiences} onChange={setF("experiences")}
-                          placeholder={"Software Engineer | Acme Corp | Jan 2022 â€“ Mar 2024\n- Built REST APIs handling 50k daily requests\n- Led migration to TypeScript, reduced bugs by 30%"}
-                          rows={12}
-                          className="w-full rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none resize-none font-mono"
-                          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-                          onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.6)"}
-                          onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"} />
+                          placeholder={"Software Engineer | Acme Corp | Jan 2022 - Mar 2024\n- Built REST APIs handling 50k daily requests\n- Led migration to TypeScript, reduced bugs by 30%"}
+                          rows={14} className="field" style={{ padding:"8px 12px", resize:"vertical", fontFamily:"var(--font-geist-mono)", fontSize:"12px" }} />
                       </div>
-
-                      <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <label className="text-xs block mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>Skills <span style={{ color: "rgba(255,255,255,0.2)" }}>(comma-separated)</span></label>
-                        <textarea value={form.skills} onChange={setF("skills")}
-                          placeholder="Python, TypeScript, React, PostgreSQL, AWS, Docker" rows={2}
-                          className="w-full rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none resize-none"
-                          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-                          onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.6)"}
-                          onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"} />
+                      <div className="card" style={{ padding:"18px" }}>
+                        <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Skills</label>
+                        <textarea value={form.skills} onChange={setF("skills")} placeholder="Python, TypeScript, React, PostgreSQL, AWS, Docker" rows={2} className="field" style={{ padding:"8px 12px", resize:"vertical" }} />
                       </div>
-
-                      <div className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <label className="text-xs block mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>Additional Notes</label>
-                        <textarea value={form.summary} onChange={setF("summary")}
-                          placeholder="Any highlights or tone you want..." rows={3}
-                          className="w-full rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none resize-none"
-                          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-                          onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.6)"}
-                          onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"} />
+                      <div className="card" style={{ padding:"18px" }}>
+                        <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Additional Notes</label>
+                        <textarea value={form.summary} onChange={setF("summary")} placeholder="Any highlights or tone you want..." rows={3} className="field" style={{ padding:"8px 12px", resize:"vertical" }} />
                       </div>
                     </div>
                   </div>
-
-                  <div className="flex gap-3">
-                    <button onClick={handleBuildResume} disabled={loading}
-                      className="flex-1 py-3 rounded-xl text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-40"
-                      style={{ background: "linear-gradient(135deg,#6366f1,#a855f7)" }}>
-                      {loading ? "Generating..." : "Generate My Resume â†’"}
+                  <div style={{ display:"flex", gap:"10px" }}>
+                    <button onClick={handleBuildResume} disabled={loading} className="btn btn-primary" style={{ flex:1, padding:"12px" }}>
+                      {loading ? "Generating..." : "Generate My Resume"}
                     </button>
-                    <button onClick={() => setStep("input")}
-                      className="px-5 py-3 rounded-xl text-sm transition-colors"
-                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
-                      Skip â†’ Upload existing
-                    </button>
+                    <button onClick={() => setStep("input")} className="btn btn-ghost" style={{ padding:"12px 20px" }}>Skip to Upload</button>
                   </div>
-
                   {generatedResume && (
-                    <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(34,197,94,0.25)" }}>
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-semibold text-green-400">âœ“ Resume Generated</h3>
-                        <button onClick={() => { setResumeText(generatedResume); setStep("input"); }}
-                          className="px-4 py-1.5 rounded-lg text-sm font-semibold text-white transition-all hover:opacity-90"
-                          style={{ background: "linear-gradient(135deg,#6366f1,#a855f7)" }}>
-                          Use this â†’ Check ATS
+                    <div className="card" style={{ padding:"18px", borderColor:"rgba(16,185,129,0.3)" }}>
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"12px" }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:"6px", color:"var(--green)" }}>
+                          {I.check} <span style={{ fontSize:"13px", fontWeight:600 }}>Resume Generated</span>
+                        </div>
+                        <button onClick={() => { setResumeText(generatedResume); setStep("input"); }} className="btn btn-primary" style={{ padding:"7px 14px", fontSize:"12px" }}>
+                          Use this and Check ATS
                         </button>
                       </div>
-                      <div className="rounded-xl p-4 max-h-64 overflow-y-auto" style={{ background: "rgba(0,0,0,0.3)" }}>
-                        <pre className="whitespace-pre-wrap text-sm text-gray-300 font-sans leading-relaxed">{generatedResume}</pre>
+                      <div style={{ borderRadius:"8px", padding:"14px", background:"rgba(0,0,0,0.3)", maxHeight:"260px", overflowY:"auto" }}>
+                        <pre style={{ whiteSpace:"pre-wrap", fontSize:"12px", color:"rgba(255,255,255,0.7)", fontFamily:"var(--font-geist-mono)", lineHeight:1.6 }}>{generatedResume}</pre>
                       </div>
                     </div>
                   )}
                 </div>
               )}
 
-              {/* â”€â”€ STEP 2: UPLOAD â”€â”€ */}
+              {/* UPLOAD */}
               {step === "input" && (
-                <div className="space-y-5">
-                  <div className="flex items-start justify-between">
+                <div style={{ display:"flex", flexDirection:"column", gap:"20px" }} className="animate-fadeUp">
+                  <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between" }}>
                     <div>
-                      <h2 className="text-2xl font-bold text-white">Upload & Check</h2>
-                      <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>Upload your resume and paste the job description.</p>
+                      <h2 style={{ fontSize:"22px", fontWeight:800, color:"var(--t1)", marginBottom:"4px" }}>Upload and Analyze</h2>
+                      <p style={{ fontSize:"13px", color:"var(--t2)" }}>Upload your resume and paste the job description.</p>
                     </div>
-                    <button onClick={() => setStep("home")} className="text-xs transition-colors" style={{ color: "rgba(255,255,255,0.3)" }}>â† Home</button>
+                    <button onClick={() => setStep("home")} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
                   </div>
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-3">
-                      <h3 className="text-sm font-semibold text-white">Your Resume</h3>
-                      <div
-                        className="rounded-2xl p-8 text-center cursor-pointer transition-all group"
-                        style={{ background: "rgba(255,255,255,0.02)", border: "2px dashed rgba(255,255,255,0.1)" }}
-                        onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "rgba(99,102,241,0.5)"; }}
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px" }}>
+                    <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
+                      <p style={{ fontSize:"13px", fontWeight:600, color:"var(--t1)" }}>Your Resume</p>
+                      <div className="card" style={{ padding:"32px 24px", textAlign:"center", cursor:"pointer", border:"2px dashed rgba(255,255,255,0.1)", transition:"border-color 0.15s" }}
+                        onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "rgba(124,58,237,0.5)"; }}
                         onDragLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
                         onDrop={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; const f = e.dataTransfer.files[0]; if (f) handlePdfUpload(f); }}
-                        onClick={() => fileRef.current?.click()}
-                      >
+                        onClick={() => fileRef.current?.click()}>
                         {pdfFileName ? (
                           <>
-                            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3"
-                              style={{ background: "rgba(34,197,94,0.1)" }}>âœ“</div>
-                            <p className="text-sm font-medium text-green-400">{pdfFileName}</p>
-                            <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.3)" }}>Click to replace</p>
+                            <div style={{ width:"44px", height:"44px", borderRadius:"12px", background:"rgba(16,185,129,0.1)", border:"1px solid rgba(16,185,129,0.25)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 10px" }}>{I.check}</div>
+                            <p style={{ fontSize:"13px", fontWeight:600, color:"var(--green)" }}>{pdfFileName}</p>
+                            <p style={{ fontSize:"11px", color:"var(--t2)", marginTop:"4px" }}>Click to replace</p>
                           </>
                         ) : (
                           <>
-                            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3"
-                              style={{ background: "rgba(99,102,241,0.1)", color: "#a5b4fc" }}>â†‘</div>
-                            <p className="text-sm font-medium text-white">Drop PDF here or click to browse</p>
-                            <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.3)" }}>Text-based PDFs only</p>
+                            <div style={{ width:"44px", height:"44px", borderRadius:"12px", background:"rgba(124,58,237,0.1)", border:"1px solid rgba(124,58,237,0.2)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 10px" }}>{I.uploadIc}</div>
+                            <p style={{ fontSize:"13px", fontWeight:600, color:"var(--t1)" }}>Drop PDF here or click to browse</p>
+                            <p style={{ fontSize:"11px", color:"var(--t3)", marginTop:"4px" }}>Text-based PDFs only</p>
                           </>
                         )}
-                        <input ref={fileRef} type="file" accept=".pdf" className="hidden"
-                          onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePdfUpload(f); }} />
+                        <input ref={fileRef} type="file" accept=".pdf" style={{ display:"none" }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePdfUpload(f); }} />
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
-                        <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>or paste text below</span>
-                        <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.08)" }} />
+                      <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                        <div style={{ flex:1, height:"1px", background:"var(--border)" }} />
+                        <span style={{ fontSize:"11px", color:"var(--t3)" }}>or paste text</span>
+                        <div style={{ flex:1, height:"1px", background:"var(--border)" }} />
                       </div>
                       <textarea value={resumeText} onChange={(e) => { setResumeText(e.target.value); setPdfFileName(""); }}
                         placeholder="Paste your resume text here..."
-                        rows={12}
-                        className="w-full rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none resize-none font-mono leading-relaxed"
-                        style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
-                        onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.4)"}
-                        onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.06)"} />
+                        rows={12} className="field" style={{ padding:"10px 12px", fontFamily:"var(--font-geist-mono)", fontSize:"12px", lineHeight:1.6 }} />
                     </div>
-
-                    <div className="space-y-3">
-                      <h3 className="text-sm font-semibold text-white">Job Description</h3>
+                    <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
+                      <p style={{ fontSize:"13px", fontWeight:600, color:"var(--t1)" }}>Job Description</p>
                       <textarea value={jobDescription} onChange={(e) => setJobDescription(e.target.value)}
-                        placeholder={"Paste the full job description here..."}
-                        rows={22}
-                        className="w-full rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none resize-none leading-relaxed"
-                        style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}
-                        onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.4)"}
-                        onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.06)"} />
+                        placeholder="Paste the full job description here..."
+                        rows={24} className="field" style={{ padding:"10px 12px", lineHeight:1.6 }} />
                     </div>
                   </div>
-
                   <button onClick={handleScore} disabled={loading || !resumeText.trim() || !jobDescription.trim()}
-                    className="w-full py-3.5 rounded-xl text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-40"
-                    style={{ background: "linear-gradient(135deg,#6366f1,#a855f7)" }}>
-                    {loading ? "Analysing..." : "Run ATS Analysis â†’"}
+                    className="btn btn-primary" style={{ width:"100%", padding:"13px", fontSize:"14px" }}>
+                    {loading ? "Analysing..." : "Run ATS Analysis"}
                   </button>
                 </div>
               )}
 
-              {/* â”€â”€ STEP 3: SCORE â”€â”€ */}
+              {/* SCORE */}
               {step === "score" && scoreResult && (
-                <div className="space-y-5">
-                  <div className="flex items-start justify-between">
+                <div style={{ display:"flex", flexDirection:"column", gap:"20px" }} className="animate-fadeUp">
+                  <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between" }}>
                     <div>
-                      <h2 className="text-2xl font-bold text-white">ATS Analysis</h2>
-                      <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>Full field-by-field breakdown of your resume.</p>
+                      <h2 style={{ fontSize:"22px", fontWeight:800, color:"var(--t1)", marginBottom:"4px" }}>ATS Analysis</h2>
+                      <p style={{ fontSize:"13px", color:"var(--t2)" }}>Full field-by-field breakdown of your resume.</p>
                     </div>
-                    <button onClick={reset} className="text-xs transition-colors" style={{ color: "rgba(255,255,255,0.3)" }}>â† Home</button>
+                    <button onClick={reset} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
                   </div>
-
-                  {/* Score hero */}
-                  <div className="rounded-2xl p-6 flex gap-8 items-center" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div className="card" style={{ padding:"24px", display:"flex", gap:"32px", alignItems:"center" }}>
                     <ScoreRing score={scoreResult.score} />
-                    <div className="flex-1 space-y-3">
-                      <h3 className="text-sm font-semibold text-white">Score Breakdown</h3>
+                    <div style={{ flex:1, display:"flex", flexDirection:"column", gap:"12px" }}>
+                      <p style={{ fontSize:"10px", fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--t3)" }}>Breakdown</p>
                       <MiniBar label="Keyword Match (45%)" value={scoreResult.breakdown.keywordMatch} />
-                      <MiniBar label="Sections & Contact (25%)" value={scoreResult.breakdown.sections} />
-                      <MiniBar label="Content Quality (20%)" value={scoreResult.breakdown.content} />
-                      <MiniBar label="ATS Formatting (10%)" value={scoreResult.breakdown.formatting} />
+                      <MiniBar label="Sections and Contact (25%)" value={scoreResult.breakdown.sections} delay={100} />
+                      <MiniBar label="Content Quality (20%)" value={scoreResult.breakdown.content} delay={200} />
+                      <MiniBar label="ATS Formatting (10%)" value={scoreResult.breakdown.formatting} delay={300} />
                     </div>
-                    <div className="text-right space-y-1">
-                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>Keywords matched</p>
-                      <p className="text-3xl font-bold text-white">{scoreResult.matchedKeywords.length}<span className="text-lg font-normal" style={{ color: "rgba(255,255,255,0.3)" }}>/{scoreResult.totalKeywords}</span></p>
+                    <div style={{ textAlign:"right" }}>
+                      <p style={{ fontSize:"11px", color:"var(--t3)", marginBottom:"4px" }}>Keywords matched</p>
+                      <p style={{ fontSize:"30px", fontWeight:800, color:"var(--t1)", lineHeight:1, fontFamily:"var(--font-geist-mono)" }}>
+                        {scoreResult.matchedKeywords.length}
+                        <span style={{ fontSize:"16px", fontWeight:400, color:"var(--t3)" }}>/{scoreResult.totalKeywords}</span>
+                      </p>
                     </div>
                   </div>
-
-                  {/* Keywords */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(239,68,68,0.2)" }}>
-                      <h3 className="text-sm font-semibold text-red-400">Missing Keywords</h3>
-                      <div className="flex flex-wrap gap-1.5">
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"14px" }}>
+                    <div className="card" style={{ padding:"18px", borderColor:"rgba(244,63,94,0.2)" }}>
+                      <p style={{ fontSize:"12px", fontWeight:700, color:"var(--red)", marginBottom:"12px" }}>Missing Keywords</p>
+                      <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
                         {scoreResult.missingKeywords.length > 0
                           ? scoreResult.missingKeywords.map((kw) => <Chip key={kw} text={kw} variant="red" />)
-                          : <p className="text-green-400 text-sm">No major missing keywords!</p>}
+                          : <p style={{ fontSize:"13px", color:"var(--green)" }}>No major missing keywords!</p>}
                       </div>
                     </div>
-                    <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(34,197,94,0.2)" }}>
-                      <h3 className="text-sm font-semibold text-green-400">Matched Keywords</h3>
-                      <div className="flex flex-wrap gap-1.5">
+                    <div className="card" style={{ padding:"18px", borderColor:"rgba(16,185,129,0.2)" }}>
+                      <p style={{ fontSize:"12px", fontWeight:700, color:"var(--green)", marginBottom:"12px" }}>Matched Keywords</p>
+                      <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
                         {scoreResult.matchedKeywords.slice(0, 25).map((kw) => <Chip key={kw} text={kw} variant="green" />)}
                       </div>
                     </div>
                   </div>
-
-                  {/* Field checks */}
                   {[
-                    { title: "Contact Information", icon: "â—‰", keys: ["Email Address", "Phone Number", "LinkedIn URL", "GitHub / Portfolio URL", "Location"] },
-                    { title: "Resume Sections", icon: "â–¤", keys: ["Professional Summary", "Summary Length", "Work Experience", "Education", "Skills Section", "Certifications", "Projects", "Employment Dates", "Job Titles"] },
-                    { title: "Content Quality", icon: "âœ¦", keys: ["Action Verbs", "Verb Variety", "Quantifiable Achievements", "Weak Language", "Resume Length", "Bullet Points"] },
-                    { title: "ATS Formatting", icon: "âš™", keys: ["Table / Column Layout", "Special Characters", "Emoji", "Standard Section Names", "ALL-CAPS Text", "Submission Format"] },
+                    { title:"Contact Information", icon:I.mail, keys:["Email Address","Phone Number","LinkedIn URL","GitHub / Portfolio URL","Location"] },
+                    { title:"Resume Sections", icon:I.folder, keys:["Professional Summary","Summary Length","Work Experience","Education","Skills Section","Certifications","Projects","Employment Dates","Job Titles"] },
+                    { title:"Content Quality", icon:I.sparkle, keys:["Action Verbs","Verb Variety","Quantifiable Achievements","Weak Language","Resume Length","Bullet Points"] },
+                    { title:"ATS Formatting", icon:I.chart, keys:["Table / Column Layout","Special Characters","Emoji","Standard Section Names","ALL-CAPS Text","Submission Format"] },
                   ].map(({ title, icon, keys }) => {
                     const checks = scoreResult.fieldChecks.filter((c) => keys.includes(c.field));
                     const passes = checks.filter((c) => c.status === "pass").length;
+                    const pct = checks.length > 0 ? (passes / checks.length) * 100 : 0;
+                    const barCol = pct === 100 ? "var(--green)" : pct >= 60 ? "var(--yellow)" : "var(--red)";
                     return (
-                      <div key={title} className="rounded-2xl p-5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-2">
-                            <span className="text-base" style={{ color: "rgba(255,255,255,0.4)" }}>{icon}</span>
-                            <h3 className="text-sm font-semibold text-white">{title}</h3>
+                      <div key={title} className="card" style={{ padding:"18px" }}>
+                        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"16px" }}>
+                          <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                            <span style={{ color:"var(--t2)", display:"flex" }}>{icon}</span>
+                            <span style={{ fontSize:"14px", fontWeight:700, color:"var(--t1)" }}>{title}</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <div className="h-1.5 w-20 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                              <div className="h-full rounded-full" style={{ width: `${(passes / checks.length) * 100}%`, background: passes === checks.length ? "#22c55e" : passes >= checks.length / 2 ? "#eab308" : "#ef4444" }} />
+                          <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                            <div style={{ width:"64px", height:"5px", borderRadius:"99px", overflow:"hidden", background:"rgba(255,255,255,0.05)" }}>
+                              <div style={{ width:`${pct}%`, height:"100%", borderRadius:"99px", background:barCol }} />
                             </div>
-                            <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>{passes}/{checks.length}</span>
+                            <span style={{ fontSize:"11px", color:"var(--t2)", fontFamily:"var(--font-geist-mono)" }}>{passes}/{checks.length}</span>
                           </div>
                         </div>
-                        <div className="space-y-3">
+                        <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
                           {checks.map((c) => (
-                            <div key={c.field} className="flex gap-3">
-                              <div className="mt-0.5 w-4 flex-shrink-0"><StatusIcon status={c.status} /></div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="text-sm text-gray-200 font-medium">{c.field}</span>
-                                  <span className={`text-xs px-1.5 py-0.5 rounded-full border
-                                    ${c.status === "pass" ? "text-green-400 border-green-800/50 bg-green-900/20" :
-                                      c.status === "warn" ? "text-yellow-400 border-yellow-800/50 bg-yellow-900/20" :
-                                      "text-red-400 border-red-800/50 bg-red-900/20"}`}>{c.status}</span>
+                            <div key={c.field} style={{ display:"flex", gap:"10px" }}>
+                              <div style={{ marginTop:"1px", flexShrink:0 }}><StatusIcon status={c.status} /></div>
+                              <div style={{ flex:1, minWidth:0 }}>
+                                <div style={{ display:"flex", alignItems:"center", gap:"8px", flexWrap:"wrap" }}>
+                                  <span style={{ fontSize:"13px", fontWeight:600, color:"var(--t1)" }}>{c.field}</span>
+                                  <span className={`tag tag-${c.status === "pass" ? "green" : c.status === "warn" ? "yellow" : "red"}`}>{c.status}</span>
                                 </div>
-                                <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{c.message}</p>
-                                {c.suggestion && <p className="text-xs mt-1 text-indigo-400">â†’ {c.suggestion}</p>}
+                                <p style={{ fontSize:"12px", color:"var(--t2)", marginTop:"2px" }}>{c.message}</p>
+                                {c.suggestion && <p style={{ fontSize:"12px", color:"#818cf8", marginTop:"4px" }}>{c.suggestion}</p>}
                               </div>
                             </div>
                           ))}
@@ -1231,359 +1124,243 @@ export default function Home() {
                       </div>
                     );
                   })}
-
-                  {/* Field suggestions */}
                   {scoreResult.fieldSuggestions?.length > 0 && (
-                    <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(99,102,241,0.2)" }}>
-                      <div>
-                        <h3 className="text-sm font-semibold text-white">Sections to Add for This Role</h3>
-                        <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>New fields that could significantly boost your score for this specific job.</p>
-                      </div>
-                      <div className="space-y-3">
+                    <div className="card" style={{ padding:"18px", borderColor:"rgba(124,58,237,0.25)" }}>
+                      <p style={{ fontSize:"14px", fontWeight:700, color:"var(--t1)", marginBottom:"4px" }}>Sections to Add for This Role</p>
+                      <p style={{ fontSize:"12px", color:"var(--t2)", marginBottom:"14px" }}>New fields that could significantly boost your score for this specific job.</p>
+                      <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
                         {scoreResult.fieldSuggestions.map((s, i) => (
-                          <div key={i} className="rounded-xl p-4 space-y-1.5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-semibold text-white">{s.field}</span>
-                              <span className={`text-xs px-2 py-0.5 rounded-full font-medium
-                                ${s.priority === "high" ? "bg-red-900/40 text-red-400 border border-red-800/50" :
-                                  s.priority === "medium" ? "bg-yellow-900/40 text-yellow-400 border border-yellow-800/50" :
-                                  "bg-gray-800/50 text-gray-400 border border-gray-700/50"}`}>
-                                {s.priority}
-                              </span>
+                          <div key={i} className="card" style={{ padding:"14px", background:"var(--s2)" }}>
+                            <div style={{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"6px" }}>
+                              <span style={{ fontSize:"13px", fontWeight:600, color:"var(--t1)" }}>{s.field}</span>
+                              <span className={`tag tag-${s.priority === "high" ? "red" : s.priority === "medium" ? "yellow" : "violet"}`}>{s.priority}</span>
                             </div>
-                            <p className="text-xs text-gray-300">{s.reason}</p>
-                            <div className="rounded-lg px-3 py-1.5" style={{ background: "rgba(99,102,241,0.08)" }}>
-                              <p className="text-xs text-indigo-300 font-mono">{s.example}</p>
+                            <p style={{ fontSize:"12px", color:"var(--t2)", marginBottom:"8px" }}>{s.reason}</p>
+                            <div style={{ borderRadius:"6px", padding:"8px 12px", background:"rgba(124,58,237,0.06)", border:"1px solid rgba(124,58,237,0.12)" }}>
+                              <p style={{ fontSize:"11px", color:"#a5b4fc", fontFamily:"var(--font-geist-mono)" }}>{s.example}</p>
                             </div>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
-
-                  <div className="flex gap-3">
-                    <button onClick={() => setStep("input")}
-                      className="px-5 py-3 rounded-xl text-sm transition-colors"
-                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
-                      â† Edit inputs
-                    </button>
-                    <button onClick={handleTailor} disabled={loading}
-                      className="flex-1 py-3 rounded-xl text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-40"
-                      style={{ background: "linear-gradient(135deg,#6366f1,#a855f7)" }}>
-                      {loading ? "Analysing..." : "Get AI Coaching â†’"}
+                  <div style={{ display:"flex", gap:"10px" }}>
+                    <button onClick={() => setStep("input")} className="btn btn-ghost" style={{ padding:"12px 20px" }}>Edit inputs</button>
+                    <button onClick={handleTailor} disabled={loading} className="btn btn-primary" style={{ flex:1, padding:"12px" }}>
+                      {loading ? "Analysing..." : "Get AI Coaching"}
                     </button>
                   </div>
                 </div>
               )}
 
-              {/* â”€â”€ STEP 4: TAILOR â”€â”€ */}
+              {/* TAILOR */}
               {step === "tailor" && tailorResult && (
-                <div className="space-y-5">
-                  <div className="flex items-start justify-between">
+                <div style={{ display:"flex", flexDirection:"column", gap:"20px" }} className="animate-fadeUp">
+                  <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between" }}>
                     <div>
-                      <h2 className="text-2xl font-bold text-white">AI Coach</h2>
-                      <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>Coaching, cover letter, and HR message â€” all in one place.</p>
+                      <h2 style={{ fontSize:"22px", fontWeight:800, color:"var(--t1)", marginBottom:"4px" }}>AI Coach</h2>
+                      <p style={{ fontSize:"13px", color:"var(--t2)" }}>Coaching, cover letter, and HR message.</p>
                     </div>
-                    <button onClick={reset} className="text-xs transition-colors" style={{ color: "rgba(255,255,255,0.3)" }}>â† Home</button>
+                    <button onClick={reset} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
                   </div>
-
-                  {/* Score bar */}
-                  <div className="rounded-2xl p-5 flex items-center gap-6" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    <div className="text-center">
-                      <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.35)" }}>Current</p>
-                      <p className="text-4xl font-bold text-red-400">{tailorResult.scoreBefore}</p>
+                  <div className="card" style={{ padding:"20px", display:"flex", alignItems:"center", gap:"20px" }}>
+                    <div style={{ textAlign:"center", flexShrink:0 }}>
+                      <p style={{ fontSize:"11px", color:"var(--t3)", marginBottom:"4px" }}>Current</p>
+                      <p style={{ fontSize:"36px", fontWeight:800, color:"var(--red)", fontFamily:"var(--font-geist-mono)", lineHeight:1 }}>{tailorResult.scoreBefore}</p>
                     </div>
-                    <div className="flex-1">
-                      <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
-                        <div className="h-full rounded-full transition-all duration-1000"
-                          style={{ width: `${tailorResult.scorePotential}%`, background: "linear-gradient(90deg,#ef4444,#eab308,#22c55e)" }} />
+                    <div style={{ flex:1 }}>
+                      <div style={{ height:"8px", borderRadius:"99px", overflow:"hidden", background:"rgba(255,255,255,0.05)" }}>
+                        <div style={{ width:`${tailorResult.scorePotential}%`, height:"100%", borderRadius:"99px", background:"linear-gradient(90deg,var(--red),var(--yellow),var(--green))" }} className="animate-bar" />
                       </div>
-                      <p className="text-xs mt-1.5 text-center" style={{ color: "rgba(255,255,255,0.3)" }}>
-                        Apply suggestions to reach {tailorResult.scorePotential}
+                      <p style={{ fontSize:"12px", textAlign:"center", color:"var(--t2)", marginTop:"8px" }}>
+                        Apply all suggestions to reach {tailorResult.scorePotential}
                       </p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.35)" }}>Potential</p>
-                      <p className="text-4xl font-bold text-green-400">{tailorResult.scorePotential}</p>
+                    <div style={{ textAlign:"center", flexShrink:0 }}>
+                      <p style={{ fontSize:"11px", color:"var(--t3)", marginBottom:"4px" }}>Potential</p>
+                      <p style={{ fontSize:"36px", fontWeight:800, color:"var(--green)", fontFamily:"var(--font-geist-mono)", lineHeight:1 }}>{tailorResult.scorePotential}</p>
                     </div>
                   </div>
-
-                  {/* Tabs */}
-                  <div className="flex gap-1 p-1 rounded-xl" style={{ background: "rgba(255,255,255,0.04)" }}>
+                  <div className="tab-bar">
                     {([
-                      { id: "coach" as const, label: "Coaching Report", icon: "âœ¦" },
-                      { id: "cover" as const, label: "Cover Letter", icon: "âœ‰" },
-                      { id: "hr" as const, label: "HR Message", icon: "â†—" },
+                      { id:"coach" as const, label:"Coaching", icon:I.sparkle },
+                      { id:"cover" as const, label:"Cover Letter", icon:I.mail },
+                      { id:"hr"    as const, label:"HR Message", icon:I.send },
                     ]).map((tab) => (
-                      <button key={tab.id} onClick={() => setTailorTab(tab.id)}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-sm font-medium transition-all"
-                        style={{
-                          background: tailorTab === tab.id ? "rgba(99,102,241,0.2)" : "transparent",
-                          color: tailorTab === tab.id ? "#a5b4fc" : "rgba(255,255,255,0.4)",
-                          border: tailorTab === tab.id ? "1px solid rgba(99,102,241,0.3)" : "1px solid transparent",
-                        }}>
-                        <span style={{ fontSize: "12px" }}>{tab.icon}</span>
-                        <span className="hidden sm:block">{tab.label}</span>
+                      <button key={tab.id} onClick={() => setTailorTab(tab.id)} className={`tab${tailorTab === tab.id ? " active" : ""}`}>
+                        {tab.icon} {tab.label}
                       </button>
                     ))}
                   </div>
-
-                  {/* Tab: Coaching */}
                   {tailorTab === "coach" && (
-                    <div className="space-y-4">
+                    <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
                       {tailorResult.summaryTip && (
-                        <div className="rounded-2xl p-4" style={{ background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.2)" }}>
-                          <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wide mb-1">Summary Tip</p>
-                          <p className="text-sm text-gray-200">{tailorResult.summaryTip}</p>
+                        <div style={{ padding:"14px 16px", borderRadius:"10px", background:"rgba(124,58,237,0.08)", border:"1px solid rgba(124,58,237,0.2)" }}>
+                          <p style={{ fontSize:"10px", fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color:"#8b5cf6", marginBottom:"6px" }}>Summary Tip</p>
+                          <p style={{ fontSize:"13px", color:"var(--t1)", lineHeight:1.5 }}>{tailorResult.summaryTip}</p>
                         </div>
                       )}
-
                       {tailorResult.keywordSuggestions?.length > 0 && (
-                        <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                          <h3 className="text-sm font-semibold text-white">Missing Keywords to Add</h3>
-                          <div className="space-y-3">
+                        <div className="card" style={{ padding:"18px" }}>
+                          <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)", marginBottom:"12px" }}>Missing Keywords to Add</p>
+                          <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
                             {tailorResult.keywordSuggestions.map((k, i) => (
-                              <div key={i} className="rounded-xl p-3 space-y-1.5" style={{ background: "rgba(255,255,255,0.03)" }}>
-                                <span className="inline-block text-xs font-semibold px-2.5 py-0.5 rounded-full"
-                                  style={{ background: "rgba(99,102,241,0.2)", color: "#a5b4fc", border: "1px solid rgba(99,102,241,0.3)" }}>
-                                  {k.keyword}
-                                </span>
-                                <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}><span className="text-gray-300 font-medium">Where:</span> {k.whereTo}</p>
-                                <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}><span className="text-gray-300 font-medium">How:</span> {k.how}</p>
+                              <div key={i} style={{ padding:"12px", borderRadius:"8px", background:"var(--s2)", border:"1px solid var(--border)" }}>
+                                <span className="chip chip-violet" style={{ marginBottom:"8px", display:"inline-block" }}>{k.keyword}</span>
+                                <p style={{ fontSize:"12px", color:"var(--t2)", marginBottom:"4px" }}><span style={{ color:"var(--t1)", fontWeight:600 }}>Where: </span>{k.whereTo}</p>
+                                <p style={{ fontSize:"12px", color:"var(--t2)" }}><span style={{ color:"var(--t1)", fontWeight:600 }}>How: </span>{k.how}</p>
                               </div>
                             ))}
                           </div>
                         </div>
                       )}
-
                       {tailorResult.bulletFeedback?.length > 0 && (
-                        <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                          <h3 className="text-sm font-semibold text-white">Bullet Point Feedback</h3>
-                          {tailorResult.bulletFeedback.map((b, i) => (
-                            <div key={i} className="rounded-xl p-4 space-y-2.5" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}>
-                              <p className="text-xs italic line-clamp-2" style={{ color: "rgba(255,255,255,0.3)" }}>"{b.original}"</p>
-                              <div className="flex items-start gap-2">
-                                <span className="text-xs flex-shrink-0 font-semibold text-red-400">Issue</span>
-                                <p className="text-xs text-gray-300">{b.issue}</p>
-                              </div>
-                              <div className="flex items-start gap-2">
-                                <span className="text-xs flex-shrink-0 font-semibold text-green-400">Tip</span>
-                                <p className="text-xs text-gray-300">{b.tip}</p>
-                              </div>
-                              {b.swapVerb && (
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs text-yellow-400 flex-shrink-0">Verb</span>
-                                  <span className="text-xs font-bold px-2 py-0.5 rounded"
-                                    style={{ background: "rgba(234,179,8,0.1)", border: "1px solid rgba(234,179,8,0.25)", color: "#fde047" }}>
-                                    {b.swapVerb}
-                                  </span>
+                        <div className="card" style={{ padding:"18px" }}>
+                          <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)", marginBottom:"14px" }}>Bullet Point Feedback</p>
+                          <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
+                            {tailorResult.bulletFeedback.map((b, i) => (
+                              <div key={i} style={{ padding:"14px", borderRadius:"8px", background:"var(--s2)", border:"1px solid var(--border)", display:"flex", flexDirection:"column", gap:"10px" }}>
+                                <p style={{ fontSize:"11px", fontStyle:"italic", color:"var(--t3)" }}>{b.original.slice(0, 120)}{b.original.length > 120 ? "..." : ""}</p>
+                                <div style={{ display:"flex", gap:"8px" }}>
+                                  <span style={{ fontSize:"10px", fontWeight:700, color:"var(--red)", flexShrink:0 }}>ISSUE</span>
+                                  <p style={{ fontSize:"12px", color:"var(--t2)" }}>{b.issue}</p>
                                 </div>
-                              )}
-                              {b.corrected && (
-                                <div className="rounded-lg p-3" style={{ background: "rgba(34,197,94,0.06)", border: "1px solid rgba(34,197,94,0.2)" }}>
-                                  <p className="text-xs font-semibold text-green-400 mb-1">Suggested rewrite</p>
-                                  <p className="text-xs text-green-200 leading-relaxed">{b.corrected}</p>
+                                <div style={{ display:"flex", gap:"8px" }}>
+                                  <span style={{ fontSize:"10px", fontWeight:700, color:"var(--green)", flexShrink:0 }}>TIP</span>
+                                  <p style={{ fontSize:"12px", color:"var(--t2)" }}>{b.tip}</p>
                                 </div>
-                              )}
-                            </div>
-                          ))}
+                                {b.swapVerb && (
+                                  <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                                    <span style={{ fontSize:"10px", fontWeight:700, color:"var(--yellow)", flexShrink:0 }}>VERB</span>
+                                    <span className="chip chip-gray">{b.swapVerb}</span>
+                                  </div>
+                                )}
+                                {b.corrected && (
+                                  <div style={{ padding:"10px 12px", borderRadius:"6px", background:"rgba(16,185,129,0.06)", border:"1px solid rgba(16,185,129,0.18)" }}>
+                                    <p style={{ fontSize:"10px", fontWeight:700, color:"var(--green)", marginBottom:"4px" }}>REWRITE</p>
+                                    <p style={{ fontSize:"12px", color:"rgba(167,243,208,0.9)", lineHeight:1.6 }}>{b.corrected}</p>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
-
                       {tailorResult.powerVerbs?.length > 0 && (
-                        <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                          <h3 className="text-sm font-semibold text-white">Power Verbs for This Role</h3>
-                          <div className="flex flex-wrap gap-2">
-                            {tailorResult.powerVerbs.map((v, i) => (
-                              <span key={i} className="text-sm font-medium px-3 py-1 rounded-full transition-colors cursor-default"
-                                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}>
-                                {v}
-                              </span>
-                            ))}
+                        <div className="card" style={{ padding:"18px" }}>
+                          <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)", marginBottom:"12px" }}>Power Verbs for This Role</p>
+                          <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
+                            {tailorResult.powerVerbs.map((v) => <span key={v} className="chip chip-violet">{v}</span>)}
                           </div>
                         </div>
                       )}
                     </div>
                   )}
-
-                  {/* Tab: Cover Letter */}
                   {tailorTab === "cover" && (
-                    <div className="space-y-4">
-                      <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div>
-                          <h3 className="text-sm font-semibold text-white">Generate Your Cover Letter</h3>
-                          <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>Human-sounding. No AI clichÃ©s. Written around your real experience.</p>
+                    <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
+                      <div className="card" style={{ padding:"18px" }}>
+                        <p style={{ fontSize:"10px", fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--t3)", marginBottom:"14px" }}>Personalize</p>
+                        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"10px", marginBottom:"14px" }}>
+                          <div>
+                            <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Your Name</label>
+                            <input value={coverName} onChange={(e) => setCoverName(e.target.value)} placeholder="Jane Smith" className="field" style={{ padding:"8px 10px" }} />
+                          </div>
+                          <div>
+                            <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Company</label>
+                            <input value={coverCompany} onChange={(e) => setCoverCompany(e.target.value)} placeholder="Stripe" className="field" style={{ padding:"8px 10px" }} />
+                          </div>
+                          <div>
+                            <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Role</label>
+                            <input value={coverRole} onChange={(e) => setCoverRole(e.target.value)} placeholder="Senior SWE" className="field" style={{ padding:"8px 10px" }} />
+                          </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-3">
-                          {[
-                            { label: "Your Name", val: coverName, set: setCoverName, ph: "Pranay Mulap" },
-                            { label: "Company", val: coverCompany, set: setCoverCompany, ph: "Stripe" },
-                            { label: "Role", val: coverRole, set: setCoverRole, ph: "Senior Engineer" },
-                          ].map(({ label, val, set, ph }) => (
-                            <div key={label}>
-                              <label className="text-xs block mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>{label}</label>
-                              <input value={val} onChange={e => set(e.target.value)} placeholder={ph}
-                                className="w-full rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none"
-                                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-                                onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.6)"}
-                                onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"} />
-                            </div>
-                          ))}
-                        </div>
-                        <button onClick={handleCoverLetter} disabled={coverLoading}
-                          className="w-full py-3 rounded-xl text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-40"
-                          style={{ background: "linear-gradient(135deg,#6366f1,#a855f7)" }}>
-                          {coverLoading ? "Writing your cover letter..." : "Generate Cover Letter â†’"}
+                        <button onClick={handleCoverLetter} disabled={coverLoading} className="btn btn-primary" style={{ padding:"10px 20px" }}>
+                          {coverLoading ? "Writing..." : "Generate Cover Letter"}
                         </button>
                       </div>
-
-                      {coverResult && (
-                        <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(34,197,94,0.2)" }}>
-                          <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-semibold text-white">Cover Letter</h3>
-                            <button onClick={() => copyText(coverResult.coverLetter, setCopiedCover)}
-                              className="text-xs px-3 py-1 rounded-lg transition-all"
-                              style={{ background: copiedCover ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.06)", color: copiedCover ? "#4ade80" : "rgba(255,255,255,0.5)" }}>
-                              {copiedCover ? "âœ“ Copied" : "Copy"}
+                      {coverResult?.coverLetter && (
+                        <div className="card" style={{ padding:"18px" }}>
+                          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"12px" }}>
+                            <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)" }}>Cover Letter</p>
+                            <button onClick={() => copyText(coverResult.coverLetter, setCopiedCover)} className="btn btn-ghost" style={{ padding:"6px 10px", fontSize:"12px" }}>
+                              {copiedCover ? "Copied" : "Copy"}
                             </button>
                           </div>
-                          <div className="rounded-xl p-4 max-h-80 overflow-y-auto" style={{ background: "rgba(0,0,0,0.25)" }}>
-                            <pre className="whitespace-pre-wrap text-sm text-gray-200 font-sans leading-relaxed">{coverResult.coverLetter}</pre>
+                          <div style={{ borderRadius:"8px", padding:"16px", background:"rgba(0,0,0,0.25)", border:"1px solid var(--border)" }}>
+                            <pre style={{ whiteSpace:"pre-wrap", fontSize:"13px", color:"rgba(255,255,255,0.8)", fontFamily:"inherit", lineHeight:1.7 }}>{coverResult.coverLetter}</pre>
                           </div>
                         </div>
                       )}
                     </div>
                   )}
-
-                  {/* Tab: HR Message */}
                   {tailorTab === "hr" && (
-                    <div className="space-y-4">
-                      <div className="rounded-2xl p-5 space-y-4" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                        <div>
-                          <h3 className="text-sm font-semibold text-white">LinkedIn / HR Follow-up Message</h3>
-                          <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>Catchy. Specific to the company. Built to get a reply, not go to trash.</p>
+                    <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
+                      {!coverResult?.hrMessage ? (
+                        <div className="card" style={{ padding:"24px", textAlign:"center" }}>
+                          <div style={{ width:"44px", height:"44px", borderRadius:"12px", background:"rgba(124,58,237,0.1)", border:"1px solid rgba(124,58,237,0.2)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 12px" }}>{I.send}</div>
+                          <p style={{ fontSize:"14px", fontWeight:600, color:"var(--t1)", marginBottom:"6px" }}>HR Follow-up Message</p>
+                          <p style={{ fontSize:"13px", color:"var(--t2)", marginBottom:"16px" }}>Generate the cover letter first — the HR message is included automatically.</p>
+                          <button onClick={() => setTailorTab("cover")} className="btn btn-primary" style={{ padding:"10px 20px" }}>Go to Cover Letter</button>
                         </div>
-                        {!coverResult ? (
-                          <div className="rounded-xl p-4 text-center space-y-2" style={{ background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.1)" }}>
-                            <p className="text-sm text-gray-400">Generate the cover letter first â€” the HR message uses the same details.</p>
-                            <button onClick={() => setTailorTab("cover")} className="text-xs text-indigo-400 hover:text-indigo-300">â†’ Go to Cover Letter tab</button>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="rounded-xl p-5 space-y-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(99,102,241,0.2)" }}>
-                              <div className="flex items-center justify-between">
-                                <h4 className="text-xs font-semibold text-white">HR Follow-up Message</h4>
-                                <button onClick={() => copyText(coverResult.hrMessage, setCopiedHr)}
-                                  className="text-xs px-3 py-1 rounded-lg transition-all"
-                                  style={{ background: copiedHr ? "rgba(34,197,94,0.15)" : "rgba(255,255,255,0.06)", color: copiedHr ? "#4ade80" : "rgba(255,255,255,0.5)" }}>
-                                  {copiedHr ? "âœ“ Copied" : "Copy"}
-                                </button>
-                              </div>
-                              <p className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>Send on LinkedIn after applying. Short, specific, designed to stand out.</p>
-                              <div className="rounded-xl p-4" style={{ background: "rgba(0,0,0,0.25)" }}>
-                                <pre className="whitespace-pre-wrap text-sm text-gray-200 font-sans leading-relaxed">{coverResult.hrMessage}</pre>
-                              </div>
-                            </div>
-                            <button onClick={handleCoverLetter} disabled={coverLoading}
-                              className="w-full py-2.5 rounded-xl text-sm font-medium transition-all hover:opacity-80 disabled:opacity-40"
-                              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)" }}>
-                              {coverLoading ? "Regenerating..." : "â†º Regenerate both"}
+                      ) : (
+                        <div className="card" style={{ padding:"18px" }}>
+                          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"12px" }}>
+                            <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)" }}>LinkedIn / HR Message</p>
+                            <button onClick={() => copyText(coverResult.hrMessage, setCopiedHr)} className="btn btn-ghost" style={{ padding:"6px 10px", fontSize:"12px" }}>
+                              {copiedHr ? "Copied" : "Copy"}
                             </button>
-                          </>
-                        )}
-                      </div>
+                          </div>
+                          <div style={{ borderRadius:"8px", padding:"16px", background:"rgba(0,0,0,0.25)", border:"1px solid var(--border)" }}>
+                            <pre style={{ whiteSpace:"pre-wrap", fontSize:"13px", color:"rgba(255,255,255,0.8)", fontFamily:"inherit", lineHeight:1.7 }}>{coverResult.hrMessage}</pre>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
-
-                  {/* Save */}
-                  <div className="rounded-2xl p-5 space-y-3" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                    <div>
-                      <h3 className="text-sm font-semibold text-white">Save to a Role Folder</h3>
-                      <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>Store this application so you can come back to it later.</p>
-                    </div>
-                    <div className="flex gap-3">
-                      <input value={saveLabel} onChange={(e) => setSaveLabel(e.target.value)}
-                        placeholder="e.g. Stripe â€“ Senior Engineer"
-                        className="flex-1 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none"
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-                        onFocus={e => e.target.style.borderColor = "rgba(99,102,241,0.6)"}
-                        onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.08)"} />
-                      <button onClick={() => setShowSaveModal(true)} disabled={!saveLabel.trim()}
-                        className="px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-40"
-                        style={{ background: "linear-gradient(135deg,#6366f1,#a855f7)" }}>
-                        Save â†’
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button onClick={() => setStep("score")}
-                      className="px-5 py-3 rounded-xl text-sm transition-colors"
-                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
-                      â† Back to score
-                    </button>
-                    <button onClick={reset}
-                      className="flex-1 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90"
-                      style={{ background: "linear-gradient(135deg,#6366f1,#a855f7)" }}>
-                      + New application
+                  <div style={{ display:"flex", gap:"10px" }}>
+                    <button onClick={() => setStep("score")} className="btn btn-ghost" style={{ padding:"12px 20px" }}>Back to Score</button>
+                    <button onClick={() => setShowSaveModal(true)} disabled={!canSave} className="btn btn-primary" style={{ flex:1, padding:"12px" }}>
+                      Save Application
                     </button>
                   </div>
                 </div>
               )}
+
             </div>
           )}
         </main>
-      </div>
 
-      {/* â”€â”€ Save Modal â”€â”€ */}
-      {showSaveModal && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }}>
-          <div className="w-full max-w-md rounded-2xl p-6 space-y-4" style={{ background: "#0f0f1e", border: "1px solid rgba(255,255,255,0.1)" }}>
-            <h3 className="text-lg font-bold text-white">Save Application</h3>
-
-            <div>
-              <label className="text-xs block mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>Label</label>
-              <input value={saveLabel} onChange={(e) => setSaveLabel(e.target.value)}
-                placeholder="e.g. Stripe - Senior Engineer"
-                className="w-full rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }} />
-            </div>
-
-            <div>
-              <label className="text-xs block mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>Save to folder</label>
-              <select value={saveFolderId} onChange={(e) => setSaveFolderId(e.target.value)}
-                className="w-full rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}>
-                <option value="">Select a folder...</option>
-                {folders.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
-              </select>
-              {folders.length === 0 && (
-                <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.25)" }}>No folders yet â€” create one in the sidebar first.</p>
-              )}
-            </div>
-
-            {scoreResult && (
-              <div className="rounded-xl p-3 flex items-center justify-between" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>ATS Score</span>
-                <span className="text-sm font-bold" style={{ color: scoreColor(scoreResult.score) }}>{scoreResult.score}/100</span>
+        {/* SAVE MODAL */}
+        {showSaveModal && (
+          <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.7)", backdropFilter:"blur(8px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:200, padding:"24px" }}>
+            <div className="card" style={{ width:"100%", maxWidth:"400px", padding:"24px" }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"20px" }}>
+                <p style={{ fontSize:"15px", fontWeight:700, color:"var(--t1)" }}>Save Application</p>
+                <button onClick={() => setShowSaveModal(false)} style={{ color:"var(--t2)", background:"none", border:"none", cursor:"pointer", display:"flex" }}>{I.xmark}</button>
               </div>
-            )}
-
-            <div className="flex gap-3">
-              <button onClick={() => setShowSaveModal(false)}
-                className="flex-1 py-2.5 rounded-xl text-sm transition-colors"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.5)" }}>
-                Cancel
-              </button>
-              <button onClick={handleSave} disabled={!saveFolderId || saving}
-                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-40"
-                style={{ background: "linear-gradient(135deg,#6366f1,#a855f7)" }}>
-                {saving ? "Saving..." : "Save"}
-              </button>
+              <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
+                <div>
+                  <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"6px" }}>Label</label>
+                  <input value={saveLabel} onChange={(e) => setSaveLabel(e.target.value)} placeholder="e.g. Senior Engineer @ Stripe" className="field" style={{ padding:"9px 12px" }} />
+                </div>
+                <div>
+                  <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"6px" }}>Folder</label>
+                  <select value={saveFolderId} onChange={(e) => setSaveFolderId(e.target.value)} className="field" style={{ padding:"9px 12px" }}>
+                    <option value="">Select a folder...</option>
+                    {folders.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div style={{ display:"flex", gap:"10px", marginTop:"20px" }}>
+                <button onClick={() => setShowSaveModal(false)} className="btn btn-ghost" style={{ flex:1, padding:"10px" }}>Cancel</button>
+                <button onClick={handleSave} disabled={saving || !saveLabel || !saveFolderId} className="btn btn-primary" style={{ flex:1, padding:"10px" }}>
+                  {saving ? "Saving..." : "Save"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
