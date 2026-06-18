@@ -917,7 +917,7 @@ export default function Home() {
                   <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between" }}>
                     <div>
                       <h2 style={{ fontSize:"22px", fontWeight:800, color:"var(--t1)", marginBottom:"4px" }}>Build Your Resume</h2>
-                      <p style={{ fontSize:"13px", color:"var(--t2)" }}>Fill in your details — AI writes a fully ATS-optimized resume.</p>
+                      <p style={{ fontSize:"13px", color:"var(--t2)" }}>Fill in your details ï¿½ AI writes a fully ATS-optimized resume.</p>
                     </div>
                     <button onClick={() => setStep("home")} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
                   </div>
@@ -1315,7 +1315,7 @@ export default function Home() {
                         <div className="card" style={{ padding:"24px", textAlign:"center" }}>
                           <div style={{ width:"44px", height:"44px", borderRadius:"12px", background:"rgba(124,58,237,0.1)", border:"1px solid rgba(124,58,237,0.2)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 12px" }}>{I.send}</div>
                           <p style={{ fontSize:"14px", fontWeight:600, color:"var(--t1)", marginBottom:"6px" }}>HR Follow-up Message</p>
-                          <p style={{ fontSize:"13px", color:"var(--t2)", marginBottom:"16px" }}>Generate the cover letter first — the HR message is included automatically.</p>
+                          <p style={{ fontSize:"13px", color:"var(--t2)", marginBottom:"16px" }}>Generate the cover letter first ï¿½ the HR message is included automatically.</p>
                           <button onClick={() => setTailorTab("cover")} className="btn btn-primary" style={{ padding:"10px 20px" }}>Go to Cover Letter</button>
                         </div>
                       ) : (
