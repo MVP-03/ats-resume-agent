@@ -468,7 +468,7 @@ export default function Home() {
 
   async function handleRenameFolder(id: string, name: string) {
     if (!name.trim()) return;
-    const res = await fetch(/api/folders/, {
+    const res = await fetch(`/api/folders/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: name.trim() }),
