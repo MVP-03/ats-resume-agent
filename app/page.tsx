@@ -574,19 +574,25 @@ export default function Home() {
   async function handleDownloadDocx() {
     try {
       const sourceText = resumeText.trim();
-      if (!sourceText) { setError("No resume text to export."); return; }
+      if (!sourceText) { setError("No resume text to export. Please upload or paste your resume first."); return; }
       const res = await fetch("/api/generate-docx-text", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ resumeText: sourceText }),
       });
-      if (!res.ok) { setError("Failed to generate Word document"); return; }
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "unknown");
+        setError(`Word export failed (${res.status}): ${errText.slice(0, 120)}`);
+        return;
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url; a.download = "resume.docx"; a.click();
       URL.revokeObjectURL(url);
-    } catch { setError("Failed to generate Word document"); }
+    } catch (e: unknown) {
+      setError("Word export error: " + (e instanceof Error ? e.message : String(e)));
+    }
   }
 
   async function handleBuildResume() {
