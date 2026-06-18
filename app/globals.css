@@ -247,3 +247,42 @@ select option { background: #0f0f1e; }
 @media print {
   .no-print { display: none !important; }
 }
+
+/* ── Mobile responsive ─────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Fluid cards */
+  .card { padding: 14px !important; border-radius: 12px !important; }
+
+  /* Hide breadcrumb step labels on very small screens */
+  .flow-step-label { display: none !important; }
+
+  /* Tab bar wraps */
+  .tab-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap !important; }
+  .tab-bar button { flex-shrink: 0; }
+
+  /* Resume score grid single col */
+  .score-grid { grid-template-columns: 1fr !important; }
+
+  /* Stat rows stack */
+  .stat-row { flex-direction: column !important; }
+
+  /* Full-width buttons */
+  .btn-full-mobile { width: 100% !important; justify-content: center; }
+
+  /* Remove large heading margins */
+  h1, h2 { margin-bottom: 8px !important; }
+
+  /* Textarea comfortable height */
+  textarea { min-height: 100px; }
+
+  /* Nav items in sidebar show properly */
+  .nav-item { padding: 8px 10px !important; font-size: 13px !important; }
+
+  /* Table overflow */
+  table { display: block; overflow-x: auto; }
+}
+
+@media (max-width: 480px) {
+  .card { padding: 12px !important; }
+  .tag { font-size: 10px !important; padding: 2px 7px !important; }
+}

@@ -398,6 +398,7 @@ export default function Home() {
 
   // sidebar state
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [folderResumes, setFolderResumes] = useState<SavedResume[]>([]);
@@ -444,6 +445,17 @@ export default function Home() {
     if (selectedFolder) loadFolderResumes(selectedFolder);
     else setFolderResumes([]);
   }, [selectedFolder, loadFolderResumes]);
+
+  useEffect(() => {
+    const check = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) setSidebarOpen(false);
+    };
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   // ── actions ────────────────────────────────────────────────────────────
 
@@ -559,6 +571,37 @@ export default function Home() {
     setPdfLoading(false);
   }
 
+  async function handleDownloadDocx() {
+    try {
+      const expArr = form.experiences.split(/`\\n{2,}`/).filter(Boolean).map(block => {
+        const lines = block.trim().split("\n").map((l: string) => l.trim()).filter(Boolean);
+        const [company, role, duration, ...bullets] = lines;
+        return { company: company||"", role: role||"", duration: duration||"", bullets };
+      });
+      const eduArr = form.education.split(/\n/).filter(Boolean).map(line => {
+        const [school, degree, year] = line.split(",").map((s: string) => s.trim());
+        return { school: school||line, degree: degree||"", year: year||"" };
+      });
+      const skillArr = form.skills.split(/[,\n]/).map((s: string) => s.trim()).filter(Boolean);
+      const res = await fetch("/api/generate-docx", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name, email: form.email, phone: form.phone,
+          linkedin: form.linkedin, jobTitle: form.jobTitle,
+          summary: form.summary, skills: skillArr,
+          experiences: expArr, education: eduArr,
+        }),
+      });
+      if (!res.ok) { setError("Failed to generate Word document"); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = (form.name || "resume").replace(/\s+/g, "_") + "_resume.docx"; a.click();
+      URL.revokeObjectURL(url);
+    } catch { setError("Failed to generate Word document"); }
+  }
+
   async function handleBuildResume() {
     if (!form.name || !form.email || !form.experiences) {
       setError("Name, email, and work experience are required.");
@@ -661,11 +704,22 @@ export default function Home() {
     <div style={{ minHeight:"100vh", display:"flex", background:"var(--bg)" }}>
 
       {/* SIDEBAR */}
+      {isMobile && sidebarOpen && (
+        <div onClick={() => setSidebarOpen(false)}
+          style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.6)", zIndex:19, backdropFilter:"blur(4px)" }} />
+      )}
       <aside style={{
-        width: sidebarOpen ? "224px" : "0px", minWidth: sidebarOpen ? "224px" : "0px",
+        ...(isMobile ? {
+          position:"fixed", top:0, left: sidebarOpen ? 0 : "-280px", bottom:0,
+          width:"280px", zIndex:20, transition:"left 0.25s ease",
+          boxShadow: sidebarOpen ? "4px 0 40px rgba(0,0,0,0.5)" : "none",
+        } : {
+          width: sidebarOpen ? "224px" : "0px", minWidth: sidebarOpen ? "224px" : "0px",
+          transition:"width 0.25s ease, min-width 0.25s ease",
+        }),
         flexShrink: 0, display:"flex", flexDirection:"column",
         background:"var(--s1)", borderRight:"1px solid var(--border)",
-        overflow:"hidden", transition:"width 0.25s ease, min-width 0.25s ease",
+        overflow:"hidden",
       }}>
         {sidebarOpen && (
           <>
@@ -797,7 +851,7 @@ export default function Home() {
 
         {/* HEADER */}
         <header style={{ flexShrink:0, display:"flex", alignItems:"center", justifyContent:"space-between",
-          padding:"0 20px", height:"52px", background:"rgba(6,6,14,0.9)",
+          padding: isMobile ? "0 12px" : "0 20px", height: isMobile ? "48px" : "52px", background:"rgba(6,6,14,0.9)",
           borderBottom:"1px solid var(--border)", backdropFilter:"blur(12px)",
           position:"sticky", top:0, zIndex:10 }}>
           <div style={{ display:"flex", alignItems:"center", gap:"12px" }}>
@@ -873,7 +927,7 @@ export default function Home() {
 
           {/* HOME */}
           {step === "home" && (
-            <div style={{ maxWidth:"860px", margin:"0 auto", padding:"36px 24px", display:"flex", flexDirection:"column", gap:"28px" }} className="animate-fadeUp dot-grid">
+            <div style={{ maxWidth:"860px", margin:"0 auto", padding: isMobile ? "20px 14px" : "36px 24px", display:"flex", flexDirection:"column", gap:"28px" }} className="animate-fadeUp dot-grid">
               <div>
                 <span className="tag tag-violet" style={{ marginBottom:"12px", display:"inline-flex" }}>AI-Powered ATS Agent</span>
                 <h1 style={{ fontSize:"34px", fontWeight:800, lineHeight:1.1, marginBottom:"10px" }} className="gradient-text">
@@ -1140,7 +1194,14 @@ export default function Home() {
                       <h2 style={{ fontSize:"22px", fontWeight:800, color:"var(--t1)", marginBottom:"4px" }}>ATS Analysis</h2>
                       <p style={{ fontSize:"13px", color:"var(--t2)" }}>Full field-by-field breakdown of your resume.</p>
                     </div>
-                    <button onClick={reset} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
+                    <div style={{ display:"flex", gap:"8px", flexWrap:"wrap", justifyContent:"flex-end" }}>
+                      <button onClick={handleDownloadDocx}
+                        style={{ display:"flex", alignItems:"center", gap:"6px", padding:"6px 14px", borderRadius:"9px",
+                          background:"linear-gradient(135deg,#2563eb,#4f46e5)", color:"#fff", fontWeight:600, fontSize:"12px", border:"none", cursor:"pointer" }}>
+                        â¬‡ Word (.docx)
+                      </button>
+                      <button onClick={reset} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
+                    </div>
                   </div>
                   <div className="card" style={{ padding:"24px", display:"flex", gap:"32px", alignItems:"center" }}>
                     <ScoreRing score={scoreResult.score} />
@@ -1254,7 +1315,14 @@ export default function Home() {
                       <h2 style={{ fontSize:"22px", fontWeight:800, color:"var(--t1)", marginBottom:"4px" }}>AI Coach</h2>
                       <p style={{ fontSize:"13px", color:"var(--t2)" }}>Coaching, cover letter, and HR message.</p>
                     </div>
-                    <button onClick={reset} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
+                    <div style={{ display:"flex", gap:"8px", flexWrap:"wrap", justifyContent:"flex-end" }}>
+                      <button onClick={handleDownloadDocx}
+                        style={{ display:"flex", alignItems:"center", gap:"6px", padding:"6px 14px", borderRadius:"9px",
+                          background:"linear-gradient(135deg,#2563eb,#4f46e5)", color:"#fff", fontWeight:600, fontSize:"12px", border:"none", cursor:"pointer" }}>
+                        â¬‡ Word (.docx)
+                      </button>
+                      <button onClick={reset} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
+                    </div>
                   </div>
                   <div className="card" style={{ padding:"20px", display:"flex", alignItems:"center", gap:"20px" }}>
                     <div style={{ textAlign:"center", flexShrink:0 }}>
