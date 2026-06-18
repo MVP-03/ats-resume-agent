@@ -403,6 +403,8 @@ export default function Home() {
   const [folderResumes, setFolderResumes] = useState<SavedResume[]>([]);
   const [newFolderName, setNewFolderName] = useState("");
   const [showNewFolder, setShowNewFolder] = useState(false);
+  const [renamingFolderId, setRenamingFolderId] = useState<string | null>(null);
+  const [renameFolderName, setRenameFolderName] = useState("");
   const [saveLabel, setSaveLabel] = useState("");
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [saveFolderId, setSaveFolderId] = useState("");
@@ -481,7 +483,7 @@ export default function Home() {
   }
 
   async function handleDeleteFolder(id: string) {
-    const res = await fetch(/api/folders/, { method: "DELETE" });
+    const res = await fetch(`/api/folders/${id}`, { method: "DELETE" });
     if (res.ok) {
       setFolders(f => f.filter(x => x.id !== id));
       if (selectedFolder === id) setSelectedFolder(null);
