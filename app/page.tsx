@@ -466,6 +466,27 @@ export default function Home() {
     } catch { setError("Failed to create folder — check your connection."); }
   }
 
+  async function handleRenameFolder(id: string, name: string) {
+    if (!name.trim()) return;
+    const res = await fetch(/api/folders/, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name.trim() }),
+    });
+    if (res.ok) {
+      setFolders(f => f.map(x => x.id === id ? { ...x, name: name.trim() } : x));
+    }
+    setRenamingFolderId(null);
+    setRenameFolderName("");
+  }
+
+  async function handleDeleteFolder(id: string) {
+    const res = await fetch(/api/folders/, { method: "DELETE" });
+    if (res.ok) {
+      setFolders(f => f.filter(x => x.id !== id));
+      if (selectedFolder === id) setSelectedFolder(null);
+    }
+  }
   async function handleSave() {
     if (!saveFolderId) return;
     setSaving(true);
@@ -706,18 +727,28 @@ export default function Home() {
               ) : (
                 folders.map((folder) => (
                   <div key={folder.id}>
-                    <button onClick={() => setSelectedFolder(selectedFolder === folder.id ? null : folder.id)}
-                      style={{ width:"100%", textAlign:"left", padding:"6px 8px", borderRadius:"8px", fontSize:"12px",
-                        display:"flex", alignItems:"center", justifyContent:"space-between", gap:"6px",
-                        background: selectedFolder === folder.id ? "rgba(124,58,237,0.1)" : "transparent",
-                        color: selectedFolder === folder.id ? "#c4b5fd" : "var(--t2)",
-                        border:"none", cursor:"pointer" }}>
-                      <span style={{ display:"flex", alignItems:"center", gap:"6px", overflow:"hidden" }}>
-                        <span style={{ flexShrink:0, opacity:0.7 }}>{I.folder}</span>
-                        <span style={{ overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontWeight:500 }}>{folder.name}</span>
-                      </span>
-                      <span style={{ flexShrink:0, opacity:0.5 }}>{selectedFolder === folder.id ? I.chevD : I.chevR}</span>
-                    </button>
+                    {renamingFolderId === folder.id ? (
+                      <div style={{ display:"flex", alignItems:"center", gap:"4px", padding:"4px" }}>
+                        <input autoFocus value={renameFolderName} onChange={e => setRenameFolderName(e.target.value)}
+                          onKeyDown={e => { if (e.key === "Enter") handleRenameFolder(folder.id, renameFolderName); if (e.key === "Escape") { setRenamingFolderId(null); } }}
+                          style={{ flex:1, fontSize:"12px", padding:"4px 7px", borderRadius:"7px", background:"rgba(255,255,255,0.07)", border:"1px solid rgba(124,58,237,0.5)", color:"#fff", outline:"none" }} />
+                        <button onClick={() => handleRenameFolder(folder.id, renameFolderName)} style={{ padding:"3px 7px", borderRadius:"6px", fontSize:"11px", background:"rgba(124,58,237,0.25)", border:"1px solid rgba(124,58,237,0.4)", color:"#c4b5fd", cursor:"pointer" }}>✓</button>
+                        <button onClick={() => setRenamingFolderId(null)} style={{ padding:"3px 7px", borderRadius:"6px", fontSize:"11px", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", color:"rgba(255,255,255,0.4)", cursor:"pointer" }}>✕</button>
+                      </div>
+                    ) : (
+                      <div style={{ display:"flex", alignItems:"center", gap:"2px" }}>
+                        <button onClick={() => setSelectedFolder(selectedFolder === folder.id ? null : folder.id)}
+                          style={{ flex:1, textAlign:"left", padding:"6px 8px", borderRadius:"8px", fontSize:"12px", display:"flex", alignItems:"center", gap:"6px", background: selectedFolder === folder.id ? "rgba(124,58,237,0.1)" : "transparent", color: selectedFolder === folder.id ? "#c4b5fd" : "var(--t2)", border:"none", cursor:"pointer", overflow:"hidden" }}>
+                          <span style={{ flexShrink:0, opacity:0.7 }}>{I.folder}</span>
+                          <span style={{ flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", fontWeight:500 }}>{folder.name}</span>
+                          <span style={{ flexShrink:0, opacity:0.5 }}>{selectedFolder === folder.id ? I.chevD : I.chevR}</span>
+                        </button>
+                        <button onClick={() => { setRenamingFolderId(folder.id); setRenameFolderName(folder.name); }} title="Rename"
+                          style={{ flexShrink:0, width:"20px", height:"20px", borderRadius:"5px", border:"none", cursor:"pointer", fontSize:"10px", color:"rgba(255,255,255,0.4)", background:"rgba(255,255,255,0.04)", display:"flex", alignItems:"center", justifyContent:"center" }}>✎</button>
+                        <button onClick={() => handleDeleteFolder(folder.id)} title="Delete"
+                          style={{ flexShrink:0, width:"20px", height:"20px", borderRadius:"5px", border:"none", cursor:"pointer", fontSize:"10px", color:"rgba(239,68,68,0.6)", background:"rgba(239,68,68,0.05)", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+                      </div>
+                    )}
                     {selectedFolder === folder.id && (
                       <div style={{ marginLeft:"8px", marginTop:"2px" }}>
                         {folderResumes.length === 0 ? (
