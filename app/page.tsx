@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import TrackerView from "./tracker/TrackerView";
 import SocialView from "./social/SocialView";
 import NewsView from "./news/NewsView";
+import { createClient } from "@/lib/supabase-browser";
+import { useRouter } from "next/navigation";
 
 // ── types ──────────────────────────────────────────────────────────────────
 
@@ -345,6 +347,26 @@ const FLOW_STEPS: { id: Step; label: string; icon: React.ReactNode; desc: string
   { id:"tailor", label:"Coach",  icon:I.sparkle,  desc:"AI suggestions" },
 ];
 export default function Home() {
+  const router = useRouter();
+  const supabase = createClient();
+  const [user, setUser] = useState<{ email: string; name: string; initials: string } | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        const email = data.user.email || "";
+        const name = data.user.user_metadata?.full_name || email.split("@")[0];
+        const initials = name.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2);
+        setUser({ email, name, initials });
+      }
+    });
+  }, []);
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    router.push("/login");
+  }
+
   const [step, setStep] = useState<Step>("home");
   const [tailorTab, setTailorTab] = useState<"coach" | "cover" | "hr">("coach");
   const [resumeText, setResumeText] = useState("");
@@ -782,7 +804,16 @@ export default function Home() {
                 {I.saveIc} Save
               </button>
             )}
-            <div style={{ width:"30px", height:"30px", borderRadius:"50%", background:"linear-gradient(135deg,var(--accent),var(--accent-2))", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"12px", fontWeight:700, color:"#fff" }}>P</div>
+            <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+              {user && <span style={{ fontSize:"12px", color:"var(--t2)" }}>{user.name}</span>}
+              <div style={{ width:"30px", height:"30px", borderRadius:"50%", background:"linear-gradient(135deg,var(--accent),var(--accent-2))", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"12px", fontWeight:700, color:"#fff", cursor:"pointer" }}
+                title={user?.email}>
+                {user?.initials || "?"}
+              </div>
+              <button onClick={handleSignOut} className="btn btn-ghost" style={{ padding:"5px 10px", fontSize:"11px" }}>
+                Sign Out
+              </button>
+            </div>
           </div>
         </header>
 
