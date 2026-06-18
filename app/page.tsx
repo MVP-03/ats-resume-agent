@@ -642,6 +642,19 @@ export default function Home() {
                   <span style={{ fontSize:"9px", fontWeight:700, padding:"2px 6px", borderRadius:"99px", background:"rgba(16,185,129,0.15)", color:"#10b981", border:"1px solid rgba(16,185,129,0.25)" }}>NEW</span>
                 </button>
               </div>
+              <div style={{ marginTop:"2px" }}>
+                <button onClick={() => setStep("social")} className={`nav-item${step === "social" ? " active" : ""}`} style={{ color: step === "social" ? undefined : "#3b82f6" }}>
+                  {I.sparkle}
+                  <span style={{ flex:1 }}>Social Posts</span>
+                  <span style={{ fontSize:"9px", fontWeight:700, padding:"2px 6px", borderRadius:"99px", background:"rgba(59,130,246,0.15)", color:"#3b82f6", border:"1px solid rgba(59,130,246,0.25)" }}>AI</span>
+                </button>
+              </div>
+              <div style={{ marginTop:"2px" }}>
+                <button onClick={() => setStep("news")} className={`nav-item${step === "news" ? " active" : ""}`} style={{ color: step === "news" ? undefined : "#f59e0b" }}>
+                  {I.chart}
+                  <span style={{ flex:1 }}>Tech News</span>
+                </button>
+              </div>
             </div>
 
             <div style={{ height:"1px", background:"var(--border)", margin:"4px 10px 8px" }} />
