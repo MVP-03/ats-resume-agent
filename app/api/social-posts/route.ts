@@ -1,159 +1,171 @@
 export const runtime = "nodejs";
 import Groq from "groq-sdk";
 
-// Maps job titles to a veteran persona with domain-specific voice
-function getVeteranPersona(jobTitle: string): { role: string; yearsHint: string; domainVoice: string } {
-  const t = jobTitle.toLowerCase();
-
-  if (t.includes("ml") || t.includes("machine learning") || t.includes("ai") || t.includes("data scientist")) {
-    return {
-      role: "Senior ML Engineer / AI Researcher",
-      yearsHint: "8+ years in ML/AI, has shipped models to production at scale",
-      domainVoice: "Writes about model architecture tradeoffs, inference latency, training pipelines, feature engineering at scale, the gap between research papers and production reality. Cites real metrics. Skeptical of hype.",
-    };
-  }
-  if (t.includes("frontend") || t.includes("front-end") || t.includes("ui") || t.includes("react") || t.includes("vue")) {
-    return {
-      role: "Principal Frontend Engineer",
-      yearsHint: "10+ years building UIs, has led design systems and migrated legacy codebases",
-      domainVoice: "Writes about rendering performance, accessibility tradeoffs, bundle size discipline, component architecture, the cost of abstractions. Opinionated about frameworks from experience, not trends.",
-    };
-  }
-  if (t.includes("backend") || t.includes("back-end") || t.includes("api") || t.includes("server")) {
-    return {
-      role: "Staff Backend Engineer",
-      yearsHint: "10+ years building distributed systems and APIs at scale",
-      domainVoice: "Writes about database query optimization, consistency models, API design philosophy, the hidden costs of microservices, reliability engineering. Tells war stories about production incidents.",
-    };
-  }
-  if (t.includes("devops") || t.includes("sre") || t.includes("platform") || t.includes("infrastructure") || t.includes("cloud")) {
-    return {
-      role: "Senior SRE / Platform Engineer",
-      yearsHint: "9+ years in infrastructure, has built and scaled platforms handling millions of requests",
-      domainVoice: "Writes about observability, on-call culture, incident post-mortems, the philosophy of reliability, Kubernetes pain points, cost optimization at scale. Deeply pragmatic.",
-    };
-  }
-  if (t.includes("security") || t.includes("cyber") || t.includes("penetration") || t.includes("appsec")) {
-    return {
-      role: "Senior Security Engineer",
-      yearsHint: "9+ years in offensive/defensive security, has found critical CVEs",
-      domainVoice: "Writes about threat modeling, secure-by-default design, the failure modes of security theater, real attack vectors. Direct and no-nonsense. Security is an engineering discipline, not a compliance checkbox.",
-    };
-  }
-  if (t.includes("product manager") || t.includes("pm") || t.includes("product lead")) {
-    return {
-      role: "Senior Product Manager",
-      yearsHint: "8+ years shipping products at scale, has worked across 0-to-1 and growth phases",
-      domainVoice: "Writes about ruthless prioritization, the difference between output and outcome, stakeholder alignment without losing the plot, data-informed vs data-driven. Respects engineering constraints.",
-    };
-  }
-  if (t.includes("fullstack") || t.includes("full-stack") || t.includes("full stack")) {
-    return {
-      role: "Principal Full-Stack Engineer",
-      yearsHint: "10+ years across the entire stack, has made architectural decisions that aged well and some that didn't",
-      domainVoice: "Writes about system design tradeoffs, the discipline of knowing when NOT to build, pragmatic technology choices, the reality of technical debt. Respected for shipping, not theorizing.",
-    };
-  }
-  if (t.includes("mobile") || t.includes("ios") || t.includes("android") || t.includes("react native") || t.includes("flutter")) {
-    return {
-      role: "Staff Mobile Engineer",
-      yearsHint: "9+ years in native/cross-platform mobile, has shipped apps with tens of millions of users",
-      domainVoice: "Writes about app startup performance, memory management, crash rate discipline, platform API evolution, the real cost of cross-platform abstractions.",
-    };
-  }
-  if (t.includes("data engineer") || t.includes("data platform") || t.includes("analytics engineer")) {
-    return {
-      role: "Senior Data Engineer",
-      yearsHint: "8+ years building data pipelines and warehouses at scale",
-      domainVoice: "Writes about pipeline reliability, the star schema is dead narrative (and why it isn't), dbt philosophy, streaming vs batch tradeoffs, data quality as a first-class citizen.",
-    };
-  }
-  if (t.includes("engineering manager") || t.includes("em") || t.includes("eng manager") || t.includes("director")) {
-    return {
-      role: "Engineering Manager / Director",
-      yearsHint: "12+ years in tech, 5+ years managing teams, has built orgs from 3 to 50+ engineers",
-      domainVoice: "Writes about technical leadership, the maker/manager schedule tension, building engineering culture, when to rewrite vs refactor, how great engineers think.",
-    };
-  }
-
-  // Default: experienced generalist software engineer
-  return {
-    role: "Staff Software Engineer",
-    yearsHint: "10+ years building production systems across multiple companies",
-    domainVoice: "Writes with hard-earned engineering perspective. References real incidents, architectural decisions, and the difference between theory and production reality.",
-  };
+function getVeteranPersona(jobTitle: string) {
+  const t = (jobTitle || "").toLowerCase();
+  if (t.includes("ml") || t.includes("machine learning") || t.includes("ai") || t.includes("data scientist"))
+    return { role: "Senior ML Engineer", voice: "Writes about model architecture, inference latency, training pipelines, the gap between research and prod. Cites real metrics. Skeptical of hype." };
+  if (t.includes("frontend") || t.includes("react") || t.includes("vue") || t.includes("ui"))
+    return { role: "Principal Frontend Engineer", voice: "Writes about rendering perf, accessibility, bundle size discipline, component architecture, the real cost of abstractions." };
+  if (t.includes("backend") || t.includes("api") || t.includes("server"))
+    return { role: "Staff Backend Engineer", voice: "Writes about DB query optimization, consistency models, API design, reliability. Tells war stories about prod incidents." };
+  if (t.includes("devops") || t.includes("sre") || t.includes("platform") || t.includes("infra") || t.includes("cloud"))
+    return { role: "Senior SRE / Platform Engineer", voice: "Writes about observability, incident post-mortems, reliability philosophy, Kubernetes pain points, cost at scale." };
+  if (t.includes("security") || t.includes("cyber"))
+    return { role: "Senior Security Engineer", voice: "Writes about threat modeling, secure-by-default design, real attack vectors. Security is engineering, not compliance." };
+  if (t.includes("fullstack") || t.includes("full-stack") || t.includes("full stack"))
+    return { role: "Principal Full-Stack Engineer", voice: "Writes about system design tradeoffs, knowing when NOT to build, pragmatic tech choices, the reality of technical debt." };
+  if (t.includes("mobile") || t.includes("ios") || t.includes("android"))
+    return { role: "Staff Mobile Engineer", voice: "Writes about app startup perf, memory management, crash rates, platform API evolution, cross-platform tradeoffs." };
+  if (t.includes("data engineer") || t.includes("analytics"))
+    return { role: "Senior Data Engineer", voice: "Writes about pipeline reliability, dbt philosophy, streaming vs batch, data quality as a first-class citizen." };
+  return { role: "Staff Software Engineer", voice: "Writes with hard-earned engineering perspective. References real incidents, architectural decisions, theory vs production reality." };
 }
 
-const MILESTONE_CONTEXT: Record<string, string> = {
-  opentowork: "is actively searching for their next senior role after deliberate reflection",
-  applied: "has applied to a company they researched deeply and believe in technically",
-  interview: "got a technical interview — they know the process, they've been on both sides of the table",
-  offer: "received an offer after a rigorous technical process — this is validation of craft, not luck",
-  networking: "is investing in their professional network with intentionality, not desperation",
+type PostMode =
+  | "skill_showcase"    // Just learned / mastered a skill
+  | "project_launch"    // Shipped something
+  | "hot_take"          // Contrarian opinion on a tech
+  | "deep_dive"         // Teaching moment / tutorial thread
+  | "lessons_learned"   // Retrospective on a mistake or win
+  | "tool_review"       // Honest take on a tool/framework
+  | "career_milestone"  // Job milestone (applied/interview/offer)
+  | "open_to_work"      // Searching for next role
+  | "networking";       // Building connections
+
+const MODE_PROMPTS: Record<PostMode, (ctx: Record<string, string>, persona: { role: string; voice: string }) => string> = {
+
+  skill_showcase: (ctx, p) => `You are ghostwriting for a ${p.role}. Voice: ${p.voice}
+
+They just leveled up on: ${ctx.skill || ctx.topic}
+Context: ${ctx.detail || ""}
+${ctx.achievement ? `Key result: ${ctx.achievement}` : ""}
+
+Write posts that show mastery, not excitement. Share what they now understand that they didn't before. Include a specific technical nuance or gotcha that only someone who actually did the work would know. No "excited to share", no "learning never stops".`,
+
+  project_launch: (ctx, p) => `You are ghostwriting for a ${p.role}. Voice: ${p.voice}
+
+They just shipped: ${ctx.topic || ctx.skill}
+Tech used: ${ctx.tech || ""}
+What it does: ${ctx.detail || ""}
+${ctx.achievement ? `Key metric or result: ${ctx.achievement}` : ""}
+
+Write posts focused on the technical decisions made, what almost broke, and what they'd do differently. Show the engineering, not just the outcome.`,
+
+  hot_take: (ctx, p) => `You are ghostwriting for a ${p.role}. Voice: ${p.voice}
+
+Their hot take is about: ${ctx.topic || ctx.skill}
+Their position: ${ctx.detail || ""}
+${ctx.achievement ? `Supporting evidence: ${ctx.achievement}` : ""}
+
+Write genuinely contrarian, opinion-driven posts. The kind that get engineers arguing in the comments because it's provocative AND backed by real experience. Not clickbait — intellectual provocation.`,
+
+  deep_dive: (ctx, p) => `You are ghostwriting for a ${p.role}. Voice: ${p.voice}
+
+They want to teach: ${ctx.topic || ctx.skill}
+Specific angle: ${ctx.detail || ""}
+${ctx.achievement ? `Key insight to highlight: ${ctx.achievement}` : ""}
+
+LinkedIn should be a teaching thread with 3-4 numbered insights. Twitter should be the one insight that stops someone mid-scroll. Reddit should be a question + self-answer style that the community finds genuinely useful.`,
+
+  lessons_learned: (ctx, p) => `You are ghostwriting for a ${p.role}. Voice: ${p.voice}
+
+The lesson is about: ${ctx.topic || ctx.skill}
+What happened: ${ctx.detail || ""}
+${ctx.achievement ? `The outcome: ${ctx.achievement}` : ""}
+
+Write with radical honesty. Share the failure or near-failure, then the hard-won insight. Engineers respect this more than any success post. Be specific — name the actual mistake, the actual fix.`,
+
+  tool_review: (ctx, p) => `You are ghostwriting for a ${p.role}. Voice: ${p.voice}
+
+The tool or framework: ${ctx.topic || ctx.skill}
+Their take after actually using it: ${ctx.detail || ""}
+${ctx.achievement ? `Specific use case: ${ctx.achievement}` : ""}
+
+Write an honest, nuanced review. Name what it's actually good at and what the docs won't tell you. Not a marketing post — a practitioner's honest take after shipping with it.`,
+
+  career_milestone: (ctx, p) => `You are ghostwriting for a ${p.role}. Voice: ${p.voice}
+
+Milestone: ${ctx.milestone || ""}
+Company: ${ctx.company || ""}
+Role: ${ctx.jobTitle || ""}
+${ctx.achievement ? `Key thing to highlight: ${ctx.achievement}` : ""}
+${ctx.detail || ""}
+
+Bury the career update in paragraph 2. Open with a technical insight or hard-won observation relevant to their field. The career news is context for the insight, not the point.`,
+
+  open_to_work: (ctx, p) => `You are ghostwriting for a ${p.role}. Voice: ${p.voice}
+
+They are searching for their next role.
+Target role: ${ctx.jobTitle || p.role}
+${ctx.achievement ? `What they bring: ${ctx.achievement}` : ""}
+${ctx.detail || ""}
+
+DO NOT write a desperate job search post. Write from a place of strength — share what problems they want to work on, what environments they thrive in, what they've shipped. The job search is almost a footnote.`,
+
+  networking: (ctx, p) => `You are ghostwriting for a ${p.role}. Voice: ${p.voice}
+
+Networking goal: ${ctx.detail || "connecting with peers in their field"}
+${ctx.topic ? `Topic they want to discuss: ${ctx.topic}` : ""}
+${ctx.achievement ? `Something notable to establish credibility: ${ctx.achievement}` : ""}
+
+Write posts that start a real conversation, not a connection request. Share an opinion or question that only people who deeply work in ${p.role} space would care about.`,
 };
+
+const FORMAT_INSTRUCTIONS = `
+Generate three social media posts. Each must sound like it comes from someone with 10+ years of real experience. No buzzwords: no "passionate", "excited", "thrilled", "honored", "humbled", "journey", "impactful", "leverage".
+
+LINKEDIN (200-280 words):
+- Open with a hook: contrarian take, hard number, or specific technical observation
+- Be peer-to-peer, not broadcast
+- Use concrete specifics (latency numbers, scale metrics, code patterns, failure modes)
+- End with a sharp question practitioners actually care about
+- 3-4 domain-specific hashtags (e.g. #distributedsystems not #technology)
+
+TWITTER/X (max 240 chars):
+- One sharp practitioner take
+- Something senior engineers retweet because it's exactly right
+- Optional 1-2 very specific hashtags
+
+REDDIT (r/ExperiencedDevs or r/cscareerquestions):
+- Title: specific and honest, no hype
+- Body: 130-180 words, conversational, genuine, useful
+- Ask the community something real or share a hard-earned lesson
+
+Return ONLY valid JSON, no markdown fences:
+{"linkedin":"...","twitter":"...","reddit":{"title":"...","body":"..."}}`;
 
 export async function POST(req: Request) {
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
   try {
-    const { resumeText, jobTitle, company, milestone, name, achievement } = await req.json();
+    const body = await req.json();
+    const { mode, jobTitle, resumeText, ...ctx } = body as {
+      mode: PostMode;
+      jobTitle: string;
+      resumeText: string;
+      [key: string]: string;
+    };
 
     const persona = getVeteranPersona(jobTitle || "software engineer");
+    const modePromptFn = MODE_PROMPTS[mode] || MODE_PROMPTS.skill_showcase;
+    const modePrompt = modePromptFn({ ...ctx, jobTitle }, persona);
 
-    const context = `
-Persona: ${persona.role}
-Background: ${persona.yearsHint}
-Voice: ${persona.domainVoice}
-Name: ${name || "this engineer"}
-Milestone: ${MILESTONE_CONTEXT[milestone] || milestone}
-Target role: ${jobTitle || "Senior Software Engineer"}
-Target company: ${company || ""}
-Key achievement to highlight: ${achievement || ""}
-Resume excerpt (for context): ${(resumeText || "").slice(0, 500)}
-`.trim();
+    const fullPrompt = `${modePrompt}
 
-    const prompt = `You are ghostwriting social media posts for a ${persona.role} with deep technical experience. Your voice is authoritative, specific, and earned — not motivational-speaker generic. This person has seen production fires, made architectural decisions that aged well and some that didn't, and has opinions backed by scars.
+Resume context (use for background only, do not mention directly):
+${(resumeText || "").slice(0, 400)}
 
-Context about this person:
-${context}
-
-Generate three posts. Each must sound like it was written by someone who has ACTUALLY been in the trenches for 10+ years, not a junior engineer pretending to be senior. Be specific to the domain. Avoid all corporate buzzwords: no "passionate", "excited", "thrilled", "honored", "humbled", "journey".
-
-LINKEDIN POST (200-280 words):
-- Open with a contrarian take, hard-won insight, or specific technical observation — NOT a career announcement
-- Bury the actual career update in the 2nd or 3rd paragraph as context for the insight
-- Share something most people in the industry get wrong or oversimplify
-- Use concrete numbers or systems where possible (e.g., "3ms p99 latency", "15TB daily", "zero-downtime migrations")
-- End with a sharp question that practitioners actually care about
-- 3-4 domain-specific hashtags at the end (e.g., #distributedsystems not #softwareengineering)
-- Tone: peer-to-peer, not broadcast. Like talking to engineers, not impressing recruiters.
-
-TWITTER/X POST (max 240 chars including spaces):
-- One sharp, opinionated take from a practitioner's perspective
-- The kind of thing that gets retweeted by senior engineers who go "yes, exactly"
-- No career announcement — pure insight or hot take
-- Optional 1-2 very specific hashtags
-
-REDDIT POST (for r/ExperiencedDevs or r/cscareerquestions):
-- Title: specific, honest, no hype (e.g., "After 10 years I finally learned to say no to rewrites — here's what changed my mind")
-- Body: 120-180 words. Conversational, specific. The kind of post that gets 400 upvotes because it's genuinely useful or honest. Share a real hard-earned lesson, reference the milestone as context but focus on the technical or career insight. Ask the community something genuine.
-
-Return ONLY valid JSON, no markdown fences:
-{
-  "linkedin": "full post text",
-  "twitter": "tweet text",
-  "reddit": { "title": "title text", "body": "body text" }
-}`;
+${FORMAT_INSTRUCTIONS}`;
 
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.8,
+      messages: [{ role: "user", content: fullPrompt }],
+      temperature: 0.82,
       response_format: { type: "json_object" },
     });
 
-    const raw = completion.choices[0].message.content || "{}";
-    const data = JSON.parse(raw);
+    const data = JSON.parse(completion.choices[0].message.content || "{}");
     return Response.json(data);
   } catch (e) {
     console.error(e);
