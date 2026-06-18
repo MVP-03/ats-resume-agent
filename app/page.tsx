@@ -573,31 +573,18 @@ export default function Home() {
 
   async function handleDownloadDocx() {
     try {
-      const expArr = form.experiences.split(/`\\n{2,}`/).filter(Boolean).map(block => {
-        const lines = block.trim().split("\n").map((l: string) => l.trim()).filter(Boolean);
-        const [company, role, duration, ...bullets] = lines;
-        return { company: company||"", role: role||"", duration: duration||"", bullets };
-      });
-      const eduArr = form.education.split(/\n/).filter(Boolean).map(line => {
-        const [school, degree, year] = line.split(",").map((s: string) => s.trim());
-        return { school: school||line, degree: degree||"", year: year||"" };
-      });
-      const skillArr = form.skills.split(/[,\n]/).map((s: string) => s.trim()).filter(Boolean);
-      const res = await fetch("/api/generate-docx", {
+      const sourceText = resumeText.trim();
+      if (!sourceText) { setError("No resume text to export."); return; }
+      const res = await fetch("/api/generate-docx-text", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name, email: form.email, phone: form.phone,
-          linkedin: form.linkedin, jobTitle: form.jobTitle,
-          summary: form.summary, skills: skillArr,
-          experiences: expArr, education: eduArr,
-        }),
+        body: JSON.stringify({ resumeText: sourceText }),
       });
       if (!res.ok) { setError("Failed to generate Word document"); return; }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url; a.download = (form.name || "resume").replace(/\s+/g, "_") + "_resume.docx"; a.click();
+      a.href = url; a.download = "resume.docx"; a.click();
       URL.revokeObjectURL(url);
     } catch { setError("Failed to generate Word document"); }
   }
