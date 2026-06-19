@@ -206,15 +206,62 @@ function EmptyState({ label }: { label: string }) {
   );
 }
 
+const REDDIT_SUBS = ["LocalLLaMA", "MachineLearning", "artificial", "singularity", "mlscaling"];
+
+async function fetchRedditBrowser(): Promise<RedditPost[]> {
+  const results = await Promise.allSettled(
+    REDDIT_SUBS.map((sub) =>
+      fetch(`https://www.reddit.com/r/${sub}/hot.json?limit=25`, {
+        headers: { Accept: "application/json" },
+      }).then((r) => r.json())
+    )
+  );
+  const posts: RedditPost[] = [];
+  const seen = new Set<string>();
+  for (const result of results) {
+    if (result.status !== "fulfilled") continue;
+    for (const child of result.value?.data?.children ?? []) {
+      const p = child?.data;
+      if (!p?.title || seen.has(p.id) || (p.score ?? 0) < 5) continue;
+      seen.add(p.id);
+      posts.push({
+        title: p.title,
+        url: p.url?.startsWith("http") ? p.url : `https://reddit.com${p.permalink}`,
+        permalink: `https://reddit.com${p.permalink}`,
+        score: p.score ?? 0,
+        author: p.author ?? "",
+        created_utc: p.created_utc ?? 0,
+        num_comments: p.num_comments ?? 0,
+        subreddit: p.subreddit ?? "",
+      });
+    }
+  }
+  return posts.sort((a, b) => b.score - a.score).slice(0, 30);
+}
+
 export default function NewsView({ onBack }: { onBack: () => void }) {
   const [tab, setTab] = useState<TabId>("hackernews");
   const [data, setData] = useState<NewsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [redditPosts, setRedditPosts] = useState<RedditPost[]>([]);
+  const [redditLoading, setRedditLoading] = useState(false);
+
+  async function fetchReddit() {
+    setRedditLoading(true);
+    try {
+      setRedditPosts(await fetchRedditBrowser());
+    } catch {
+      setRedditPosts([]);
+    } finally {
+      setRedditLoading(false);
+    }
+  }
 
   async function fetchNews() {
     setLoading(true);
     setError("");
+    fetchReddit();
     try {
       const res = await fetch("/api/news");
       const json = await res.json();
@@ -270,9 +317,9 @@ export default function NewsView({ onBack }: { onBack: () => void }) {
             <button key={t.id} onClick={() => setTab(t.id)} className={`tab${tab === t.id ? " active" : ""}`}>
               {t.icon}
               {t.label}
-              {data && (
+              {(data || t.id === "reddit") && (
                 <span style={{ fontSize: "10px", fontFamily: "var(--font-geist-mono)", color: "var(--t3)", marginLeft: "2px" }}>
-                  ({(data[t.dataKey] ?? []).length})
+                  ({t.id === "reddit" ? redditPosts.length : (data ? (data[t.dataKey] ?? []).length : 0)})
                 </span>
               )}
             </button>
@@ -392,16 +439,23 @@ export default function NewsView({ onBack }: { onBack: () => void }) {
             </>
           )}
 
-          {/* AI & Models (Reddit) */}
+          {/* AI & Models (Reddit — fetched client-side to avoid server IP blocks) */}
           {tab === "reddit" && (
             <>
-              {count === 0 && !loading ? <EmptyState label="Could not load Reddit AI communities" /> : null}
-              {count === 0 && !loading && (
-                <div style={{ padding: "12px 16px", borderRadius: "10px", background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.15)", fontSize: "12px", color: "var(--t2)" }}>
-                  Reddit occasionally blocks server-side requests. Try refreshing — it usually works on retry.
+              {redditLoading && redditPosts.length === 0 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="card" style={{ padding: "16px 20px", opacity: 0.5 }}>
+                      <div style={{ height: "14px", borderRadius: "6px", background: "var(--s3)", width: `${60 + i * 5}%`, marginBottom: "8px" }} />
+                      <div style={{ height: "10px", borderRadius: "4px", background: "var(--s3)", width: "30%" }} />
+                    </div>
+                  ))}
                 </div>
               )}
-              {(data?.reddit ?? []).map((post) => (
+              {!redditLoading && redditPosts.length === 0 && (
+                <EmptyState label="Could not load Reddit AI communities — try refreshing" />
+              )}
+              {redditPosts.map((post) => (
                 <a key={post.permalink} href={post.permalink} target="_blank" rel="noreferrer" style={{ textDecoration: "none" }}>
                   <div className="card card-hover" style={{ padding: "14px 18px" }}>
                     <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--t1)", marginBottom: "6px", lineHeight: 1.4, display: "flex", alignItems: "flex-start", gap: "6px" }}>
