@@ -160,7 +160,7 @@ async function buildDocx(resumeText: string) {
   });
 
   const buffer = await Packer.toBuffer(doc);
-  const filename = `${name.replace(/\s+/g, "_")}_resume.docx`;
+  const filename = `${name.replace(/[^\x20-\x7E]/g, "").replace(/\s+/g, "_").trim() || "resume"}_resume.docx`;
 
   return new NextResponse(buffer as unknown as BodyInit, {
     headers: {
