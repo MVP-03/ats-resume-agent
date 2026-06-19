@@ -588,8 +588,12 @@ export default function Home() {
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.href = url; a.download = "resume.docx"; a.click();
-      URL.revokeObjectURL(url);
+      a.href = url;
+      a.download = "resume.docx";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
     } catch (e: unknown) {
       setError("Word export error: " + (e instanceof Error ? e.message : String(e)));
     }
