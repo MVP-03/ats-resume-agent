@@ -1195,7 +1195,7 @@ export default function Home() {
                       <button onClick={handleDownloadDocx}
                         style={{ display:"flex", alignItems:"center", gap:"6px", padding:"6px 14px", borderRadius:"9px",
                           background:"linear-gradient(135deg,#2563eb,#4f46e5)", color:"#fff", fontWeight:600, fontSize:"12px", border:"none", cursor:"pointer" }}>
-                        â¬‡ Word (.docx)
+                        Word (.docx)
                       </button>
                       <button onClick={reset} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
                     </div>
@@ -1316,7 +1316,7 @@ export default function Home() {
                       <button onClick={handleDownloadDocx}
                         style={{ display:"flex", alignItems:"center", gap:"6px", padding:"6px 14px", borderRadius:"9px",
                           background:"linear-gradient(135deg,#2563eb,#4f46e5)", color:"#fff", fontWeight:600, fontSize:"12px", border:"none", cursor:"pointer" }}>
-                        â¬‡ Word (.docx)
+                        Word (.docx)
                       </button>
                       <button onClick={reset} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
                     </div>

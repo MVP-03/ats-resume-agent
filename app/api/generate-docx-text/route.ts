@@ -54,8 +54,30 @@ function twoColPara(left: string, leftBold: boolean, right: string): Paragraph {
 }
 
 export async function POST(req: NextRequest) {
-  const { resumeText } = await req.json();
-  if (!resumeText) return NextResponse.json({ error: "No resume text" }, { status: 400 });
+  let resumeText: string;
+  try {
+    const body = await req.json();
+    resumeText = body.resumeText;
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  if (!resumeText || !resumeText.trim()) {
+    return NextResponse.json({ error: "No resume text provided" }, { status: 400 });
+  }
+
+  try {
+    return await buildDocx(resumeText);
+  } catch (e) {
+    console.error("[generate-docx-text] Error:", e);
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : "Failed to build DOCX" },
+      { status: 500 }
+    );
+  }
+}
+
+async function buildDocx(resumeText: string) {
 
   const lines = resumeText.split("\n").map((l: string) => l.trim()).filter(Boolean);
 
