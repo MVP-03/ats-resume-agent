@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Props {
   resumeText: string;
@@ -48,10 +48,12 @@ function ModeFields({ mode, form, setF }: {
   form: Record<string, string>;
   setF: (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
 }) {
-  const field = (label: string, key: string, placeholder: string, multiline?: boolean, required?: boolean) => (
+  const hint = <span style={{ fontSize: "10px", color: "var(--t3)", fontWeight: 400, marginLeft: "4px" }}>optional — inferred from resume if blank</span>;
+
+  const field = (label: string, key: string, placeholder: string, multiline?: boolean, showHint?: boolean) => (
     <div>
-      <label style={{ display: "block", fontSize: "11px", fontWeight: 600, color: "var(--t2)", marginBottom: "5px" }}>
-        {label}{required && <span style={{ color: "var(--red)", marginLeft: "3px" }}>*</span>}
+      <label style={{ display: "flex", alignItems: "center", fontSize: "11px", fontWeight: 600, color: "var(--t2)", marginBottom: "5px", flexWrap: "wrap" }}>
+        {label}{showHint && hint}
       </label>
       {multiline
         ? <textarea value={form[key] || ""} onChange={setF(key)} placeholder={placeholder} rows={2}
@@ -65,64 +67,64 @@ function ModeFields({ mode, form, setF }: {
   switch (mode) {
     case "skill_showcase":
       return <>
-        {field("Skill / Technology *", "skill", "e.g. Rust async runtimes, eBPF, WASM", false, true)}
-        {field("What you now understand that you didn't before", "detail", "The specific nuance, gotcha, or mental model shift...", true)}
-        {field("Key result (optional)", "achievement", "e.g. Cut cold start by 40%, zero prod issues in 3 months")}
+        {field("Skill / Technology", "skill", "e.g. Rust async runtimes, eBPF, WASM", false, true)}
+        {field("What you now understand that you didn't before", "detail", "The specific nuance, gotcha, or mental model shift...", true, true)}
+        {field("Key result", "achievement", "e.g. Cut cold start by 40%, zero prod issues in 3 months", false, true)}
       </>;
     case "project_launch":
       return <>
-        {field("What you shipped *", "topic", "e.g. A zero-downtime DB migration tool, a real-time collab engine", false, true)}
-        {field("Tech stack used", "tech", "e.g. Rust + Tokio + PostgreSQL + Redis")}
-        {field("What it does / the hard part", "detail", "What made this interesting or non-trivial to build...", true)}
-        {field("Key metric or result", "achievement", "e.g. Handles 50k req/s, reduced deploy time 10x")}
+        {field("What you shipped", "topic", "e.g. A zero-downtime DB migration tool, a real-time collab engine", false, true)}
+        {field("Tech stack used", "tech", "e.g. Rust + Tokio + PostgreSQL + Redis", false, true)}
+        {field("What it does / the hard part", "detail", "What made this interesting or non-trivial to build...", true, true)}
+        {field("Key metric or result", "achievement", "e.g. Handles 50k req/s, reduced deploy time 10x", false, true)}
       </>;
     case "hot_take":
       return <>
-        {field("What's your take about? *", "topic", "e.g. Microservices, TypeScript, AI coding tools, ORMs", false, true)}
-        {field("Your position *", "detail", "Why you think the conventional wisdom is wrong or incomplete...", true, true)}
-        {field("Evidence / experience behind it", "achievement", "e.g. After 5 years and 3 rewrites, I've seen...")}
+        {field("What's your take about?", "topic", "e.g. Microservices, TypeScript, AI coding tools, ORMs", false, true)}
+        {field("Your position", "detail", "Why you think the conventional wisdom is wrong or incomplete...", true, true)}
+        {field("Evidence / experience behind it", "achievement", "e.g. After 5 years and 3 rewrites, I've seen...", false, true)}
       </>;
     case "deep_dive":
       return <>
-        {field("What are you teaching? *", "topic", "e.g. How Postgres MVCC actually works, CSS container queries", false, true)}
-        {field("Specific angle / insight", "detail", "The non-obvious part most tutorials skip...", true)}
-        {field("Key takeaway to drive home", "achievement", "The one thing you want readers to walk away with")}
+        {field("What are you teaching?", "topic", "e.g. How Postgres MVCC actually works, CSS container queries", false, true)}
+        {field("Specific angle / insight", "detail", "The non-obvious part most tutorials skip...", true, true)}
+        {field("Key takeaway to drive home", "achievement", "The one thing you want readers to walk away with", false, true)}
       </>;
     case "lessons_learned":
       return <>
-        {field("What's the lesson about? *", "topic", "e.g. Premature abstraction, distributed systems, hiring", false, true)}
-        {field("What happened (be specific) *", "detail", "The actual situation — what went wrong or what surprised you...", true, true)}
-        {field("The outcome", "achievement", "What changed because of this lesson")}
+        {field("What's the lesson about?", "topic", "e.g. Premature abstraction, distributed systems, hiring", false, true)}
+        {field("What happened (be specific)", "detail", "The actual situation — what went wrong or what surprised you...", true, true)}
+        {field("The outcome", "achievement", "What changed because of this lesson", false, true)}
       </>;
     case "tool_review":
       return <>
-        {field("Tool / Framework / Library *", "topic", "e.g. Bun, Drizzle ORM, Temporal, Turso, shadcn/ui", false, true)}
-        {field("Your honest take after using it *", "detail", "What it's good at, what the docs won't tell you...", true, true)}
-        {field("Your specific use case", "achievement", "What you were building when you used it")}
+        {field("Tool / Framework / Library", "topic", "e.g. Bun, Drizzle ORM, Temporal, Turso, shadcn/ui", false, true)}
+        {field("Your honest take after using it", "detail", "What it's good at, what the docs won't tell you...", true, true)}
+        {field("Your specific use case", "achievement", "What you were building when you used it", false, true)}
       </>;
     case "career_milestone":
       return <>
         <div>
-          <label style={{ display: "block", fontSize: "11px", fontWeight: 600, color: "var(--t2)", marginBottom: "5px" }}>Milestone *</label>
+          <label style={{ display: "block", fontSize: "11px", fontWeight: 600, color: "var(--t2)", marginBottom: "5px" }}>Milestone</label>
           <select value={form.milestone || "applied"} onChange={setF("milestone")} className="field" style={{ padding: "8px 12px" }}>
             {CAREER_MILESTONES.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
           </select>
         </div>
-        {field("Company (optional)", "company", "e.g. Stripe, a fintech startup, stealth")}
-        {field("What you want to highlight", "achievement", "A project, skill, or perspective that's relevant to this role")}
-        {field("Any context to weave in", "detail", "What drew you to this role / what makes this exciting technically", true)}
+        {field("Company", "company", "e.g. Stripe, a fintech startup, stealth", false, true)}
+        {field("What you want to highlight", "achievement", "A project, skill, or perspective relevant to this role", false, true)}
+        {field("Any context to weave in", "detail", "What drew you to this role / what makes this exciting", true, true)}
       </>;
     case "open_to_work":
       return <>
-        {field("Target role *", "jobTitle", "e.g. Staff Backend Engineer, ML Platform Lead", false, true)}
-        {field("What problems you want to work on", "detail", "Be specific — what scale, what domain, what impact...", true)}
-        {field("What you bring (be concrete)", "achievement", "e.g. Led migration of 200M-row DB with zero downtime, built infra for 3 0-to-1 products")}
+        {field("Target role", "jobTitle", "e.g. Staff PM, ML Platform Lead — defaults to your current title", false, true)}
+        {field("What problems you want to work on", "detail", "Be specific — what scale, what domain, what impact...", true, true)}
+        {field("What you bring (be concrete)", "achievement", "e.g. Led 0-to-1 product, grew retention 30% — inferred from resume if blank", false, true)}
       </>;
     case "networking":
       return <>
-        {field("Topic you want to discuss *", "topic", "e.g. LLM inference optimization, platform engineering culture", false, true)}
-        {field("What you're looking for", "detail", "e.g. Engineers who've scaled data pipelines past 1TB/day, PMs in dev tools", true)}
-        {field("Your credibility anchor (optional)", "achievement", "Something that establishes you actually work in this space")}
+        {field("Topic you want to discuss", "topic", "e.g. LLM inference optimization, platform engineering culture", false, true)}
+        {field("What you're looking for", "detail", "e.g. PMs in dev tools, engineers who've scaled data pipelines", true, true)}
+        {field("Your credibility anchor", "achievement", "Something that establishes you actually work in this space", false, true)}
       </>;
     default:
       return null;
@@ -159,6 +161,29 @@ export default function SocialView({ resumeText, jobDescription, onBack }: Props
   const [error, setError] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
   const [form, setForm] = useState<Record<string, string>>({ name: "", jobTitle: "" });
+
+  // Auto-extract name and role from resume on mount
+  useEffect(() => {
+    if (!resumeText) return;
+    const lines = resumeText.split("\n").map(l => l.trim()).filter(Boolean);
+    const name = lines[0] || "";
+    let jobTitle = "";
+    for (const line of lines.slice(1, 25)) {
+      if (
+        line.length > 4 && line.length < 80 &&
+        /engineer|developer|manager|designer|analyst|product|data|software|senior|staff|lead|\bpm\b|principal|architect|director|scientist|researcher/i.test(line) &&
+        !/gmail|yahoo|linkedin|github|@|\+1|\(\d{3}\)/i.test(line)
+      ) {
+        jobTitle = line;
+        break;
+      }
+    }
+    setForm(f => ({
+      ...f,
+      name: f.name || name,
+      jobTitle: f.jobTitle || jobTitle,
+    }));
+  }, [resumeText]);
 
   function setF(k: string) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -236,15 +261,39 @@ export default function SocialView({ resumeText, jobDescription, onBack }: Props
         {/* Form */}
         <div className="card" style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "12px" }}>
 
-          {/* Context */}
+          {/* Context — auto-filled from resume */}
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "11px", fontWeight: 600, color: "var(--t2)", marginBottom: "5px" }}>Your Name</label>
-              <input value={form.name || ""} onChange={setF("name")} placeholder="Jane Smith" className="field" style={{ padding: "8px 12px" }} />
+            {/* Context sources badge */}
+            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+              {resumeText && (
+                <span style={{ fontSize: "10px", padding: "2px 8px", borderRadius: "99px", background: "rgba(16,185,129,0.08)", color: "var(--green)", border: "1px solid rgba(16,185,129,0.2)", fontWeight: 600 }}>
+                  ✓ Resume loaded
+                </span>
+              )}
+              {jobDescription && (
+                <span style={{ fontSize: "10px", padding: "2px 8px", borderRadius: "99px", background: "rgba(124,58,237,0.08)", color: "#a78bfa", border: "1px solid rgba(124,58,237,0.2)", fontWeight: 600 }}>
+                  ✓ Job description loaded
+                </span>
+              )}
+              {!resumeText && (
+                <span style={{ fontSize: "10px", padding: "2px 8px", borderRadius: "99px", background: "rgba(245,158,11,0.08)", color: "var(--yellow)", border: "1px solid rgba(245,158,11,0.2)", fontWeight: 600 }}>
+                  ⚠ No resume — go back and upload one for best results
+                </span>
+              )}
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "11px", fontWeight: 600, color: "var(--t2)", marginBottom: "5px" }}>Your Role / Title</label>
-              <input value={form.jobTitle || ""} onChange={setF("jobTitle")} placeholder="e.g. Staff Backend Engineer" className="field" style={{ padding: "8px 12px" }} />
+              <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", fontWeight: 600, color: "var(--t2)", marginBottom: "5px" }}>
+                Your Name
+                {form.name && resumeText && <span style={{ fontSize: "10px", color: "var(--green)", fontWeight: 400 }}>from resume</span>}
+              </label>
+              <input value={form.name || ""} onChange={setF("name")} placeholder="Extracted from your resume" className="field" style={{ padding: "8px 12px" }} />
+            </div>
+            <div>
+              <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", fontWeight: 600, color: "var(--t2)", marginBottom: "5px" }}>
+                Your Role / Title
+                {form.jobTitle && resumeText && <span style={{ fontSize: "10px", color: "var(--green)", fontWeight: 400 }}>from resume</span>}
+              </label>
+              <input value={form.jobTitle || ""} onChange={setF("jobTitle")} placeholder="Extracted from your resume" className="field" style={{ padding: "8px 12px" }} />
             </div>
           </div>
 
