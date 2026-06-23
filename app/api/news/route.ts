@@ -32,17 +32,6 @@ interface GithubRepo {
   url: string;
 }
 
-interface RedditPost {
-  title: string;
-  url: string;
-  permalink: string;
-  score: number;
-  author: string;
-  created_utc: number;
-  num_comments: number;
-  subreddit: string;
-}
-
 interface ArxivPaper {
   title: string;
   link: string;
@@ -314,51 +303,6 @@ async function fetchGithubTrending(): Promise<GithubRepo[]> {
   }
 }
 
-async function fetchRedditAI(): Promise<RedditPost[]> {
-  const SUBS = ["LocalLLaMA", "MachineLearning", "artificial", "singularity", "mlscaling"];
-
-  try {
-    const fetches = SUBS.map((sub) =>
-      fetch(`https://www.reddit.com/r/${sub}/hot.json?limit=25`, {
-        headers: {
-          "User-Agent": "ATS-Resume-Agent/1.0 (educational aggregator)",
-          Accept: "application/json",
-        },
-        signal: AbortSignal.timeout(8000),
-      }).then((r) => r.json())
-    );
-
-    const results = await Promise.allSettled(fetches);
-    const posts: RedditPost[] = [];
-    const seen = new Set<string>();
-
-    for (const result of results) {
-      if (result.status !== "fulfilled") continue;
-      const children = result.value?.data?.children ?? [];
-      for (const child of children) {
-        const p = child?.data;
-        if (!p?.title || seen.has(p.id)) continue;
-        seen.add(p.id);
-        if ((p.score ?? 0) < 5) continue;
-        posts.push({
-          title: p.title,
-          url: p.url?.startsWith("http") ? p.url : `https://reddit.com${p.permalink}`,
-          permalink: `https://reddit.com${p.permalink}`,
-          score: p.score ?? 0,
-          author: p.author ?? "",
-          created_utc: p.created_utc ?? 0,
-          num_comments: p.num_comments ?? 0,
-          subreddit: p.subreddit ?? "",
-        });
-      }
-    }
-
-    return posts.sort((a, b) => b.score - a.score).slice(0, 30);
-  } catch {
-    return [];
-  }
-}
-
 async function fetchArxiv(): Promise<ArxivPaper[]> {
   const CATS = ["cs.AI", "cs.LG", "cs.CL"];
 
@@ -459,11 +403,10 @@ async function fetchTechNews(): Promise<RSSItem[]> {
 // ── Handler ────────────────────────────────────────────────────────────────────
 
 export async function GET() {
-  const [hackernews, devto, github, reddit, arxiv, technews] = await Promise.allSettled([
+  const [hackernews, devto, github, arxiv, technews] = await Promise.allSettled([
     fetchHackerNews(),
     fetchDevTo(),
     fetchGithubTrending(),
-    fetchRedditAI(),
     fetchArxiv(),
     fetchTechNews(),
   ]);
@@ -473,13 +416,12 @@ export async function GET() {
       hackernews: hackernews.status === "fulfilled" ? hackernews.value : [],
       devto: devto.status === "fulfilled" ? devto.value : [],
       github: github.status === "fulfilled" ? github.value : [],
-      reddit: reddit.status === "fulfilled" ? reddit.value : [],
       arxiv: arxiv.status === "fulfilled" ? arxiv.value : [],
       technews: technews.status === "fulfilled" ? technews.value : [],
       fetchedAt: Date.now(),
     },
     {
-      headers: { "Cache-Control": "s-maxage=300, stale-while-revalidate=60" },
+      headers: { "Cache-Control": "no-store" },
     }
   );
 }
