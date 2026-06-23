@@ -4,12 +4,13 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import TrackerView from "./tracker/TrackerView";
 import SocialView from "./social/SocialView";
 import NewsView from "./news/NewsView";
+import ResumeBuilderView from "./resume-builder/ResumeBuilderView";
 import { createClient } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
 
 // ── types ──────────────────────────────────────────────────────────────────
 
-type Step = "home" | "build" | "input" | "score" | "tailor" | "tracker" | "social" | "news";
+type Step = "home" | "build" | "input" | "score" | "tailor" | "tracker" | "social" | "news" | "resume-builder";
 
 interface FieldCheck {
   field: string;
@@ -738,6 +739,13 @@ export default function Home() {
                   <span style={{ flex:1 }}>Tech News</span>
                 </button>
               </div>
+              <div style={{ marginTop:"2px" }}>
+                <button onClick={() => setStep("resume-builder")} className={`nav-item${step === "resume-builder" ? " active" : ""}`} style={{ color: step === "resume-builder" ? undefined : "#a78bfa" }}>
+                  {I.pen}
+                  <span style={{ flex:1 }}>Resume Builder</span>
+                  <span style={{ fontSize:"9px", fontWeight:700, padding:"2px 6px", borderRadius:"99px", background:"rgba(167,139,250,0.15)", color:"#a78bfa", border:"1px solid rgba(167,139,250,0.25)" }}>NEW</span>
+                </button>
+              </div>
             </div>
 
             <div style={{ height:"1px", background:"var(--border)", margin:"4px 10px 8px" }} />
@@ -1022,8 +1030,15 @@ export default function Home() {
             </div>
           )}
 
+          {/* RESUME BUILDER */}
+          {step === "resume-builder" && (
+            <div style={{ height:"calc(100vh - 52px)", display:"flex", flexDirection:"column" }}>
+              <ResumeBuilderView onBack={() => setStep("home")} />
+            </div>
+          )}
+
           {/* FLOW STEPS */}
-          {step !== "home" && step !== "tracker" && step !== "social" && step !== "news" && (
+          {step !== "home" && step !== "tracker" && step !== "social" && step !== "news" && step !== "resume-builder" && (
             <div style={{ maxWidth:"900px", margin:"0 auto", padding:"32px 24px", display:"flex", flexDirection:"column", gap:"20px" }}>
 
               {/* BUILD */}
