@@ -1,5 +1,5 @@
 export const runtime = "nodejs";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
 function getVeteranPersona(jobTitle: string) {
   const t = (jobTitle || "").toLowerCase();
@@ -154,8 +154,7 @@ Return ONLY valid JSON, no markdown fences:
 {"linkedin":"...","twitter":"...","reddit":{"title":"...","body":"..."}}`;
 
 export async function POST(req: Request) {
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
   try {
     const body = await req.json();
@@ -181,15 +180,14 @@ ${jobDescription.slice(0, 600)}` : ""}
 
 ${FORMAT_INSTRUCTIONS}`;
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: fullPrompt }] }],
-      generationConfig: {
-        temperature: 0.82,
-        responseMimeType: "application/json",
-      },
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: fullPrompt }],
+      temperature: 0.82,
+      response_format: { type: "json_object" },
     });
 
-    const data = JSON.parse(result.response.text());
+    const data = JSON.parse(completion.choices[0].message.content || "{}");
     return Response.json(data);
   } catch (e) {
     console.error(e);
