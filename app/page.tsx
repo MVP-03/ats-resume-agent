@@ -65,23 +65,6 @@ interface FullResume {
   summary: string; sections: ResumeSection[];
 }
 
-// ── pdf helper (client-side) ───────────────────────────────────────────────
-
-async function extractTextFromPdf(file: File): Promise<string> {
-  const arrayBuffer = await file.arrayBuffer();
-  const pdfjsLib = await import("pdfjs-dist");
-  pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
-  const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
-  const pages: string[] = [];
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const content = await page.getTextContent();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    pages.push(content.items.map((item: any) => ("str" in item ? item.str : "")).join(" "));
-  }
-  return pages.join("\n").trim();
-}
-
 // ── Parse tailor output into structured replacements ──────────────────────
 
 function parseTailorOutput(tailored: string): { summary: string; replacements: Array<{ original: string; rewritten: string }> } {
@@ -620,11 +603,15 @@ export default function Home() {
 
   async function handlePdfUpload(file: File) {
     if (!file.name.toLowerCase().endsWith(".pdf")) { setError("Only PDF files supported."); return; }
-    setLoading(true); setLoadingMsg("Parsing PDF in your browser..."); setError(""); setPdfFileName(file.name);
+    setLoading(true); setLoadingMsg("Parsing PDF..."); setError(""); setPdfFileName(file.name);
     try {
-      const text = await extractTextFromPdf(file);
-      if (!text) throw new Error("No text found. Use a text-based PDF, not a scanned image.");
-      setResumeText(text);
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/parse-pdf", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "PDF parsing failed.");
+      if (!data.text) throw new Error("No text found. Use a text-based PDF, not a scanned image.");
+      setResumeText(data.text);
     } catch (e) { setError(e instanceof Error ? e.message : "PDF parsing failed."); setPdfFileName(""); }
     finally { setLoading(false); }
   }
