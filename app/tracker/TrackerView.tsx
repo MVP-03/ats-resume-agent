@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { Briefcase01, ActivityHeart, Star01, Percent01, Plus } from "@untitledui/icons";
+import { Button } from "@/components/base/buttons/button";
 
 export type AppStatus = "wishlist" | "applied" | "screen" | "interview" | "offer" | "rejected";
 
@@ -312,23 +314,34 @@ export default function TrackerView({ onBack }: { onBack: () => void }) {
       <div style={{ padding: isMobile ? "16px 16px 12px" : "20px 24px 16px", flexShrink:0, borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"16px" }}>
           <h2 style={{ fontSize: isMobile ? "16px" : "20px", fontWeight:800, color:"#fff" }}>Application Tracker</h2>
-          <button onClick={() => openAdd()}
-            style={{ display:"flex", alignItems:"center", gap:"6px", padding: isMobile ? "7px 12px" : "8px 16px", borderRadius:"10px", background:"linear-gradient(135deg,#6366f1,#a855f7)", color:"#fff", fontWeight:600, fontSize:"12px", border:"none", cursor:"pointer" }}>
-            + Add
-          </button>
+          <Button color="primary" size={isMobile ? "sm" : "md"} iconLeading={<Plus data-icon />} onClick={() => openAdd()}>
+            Add Application
+          </Button>
         </div>
 
-        {/* Stats */}
-        <div style={{ display:"grid", gridTemplateColumns:`repeat(${isMobile ? 2 : 4}, 1fr)`, gap:"8px", marginBottom:"14px" }}>
-          {[
-            { label:"Total",     val:apps.length,   color:"#a5b4fc" },
-            { label:"Active",    val:active,         color:"#60a5fa" },
-            { label:"Offers",    val:offers,         color:"#4ade80" },
-            { label:"Response",  val:`${rr}%`,       color:"#fbbf24" },
-          ].map(s => (
-            <div key={s.label} style={{ borderRadius:"10px", padding: isMobile ? "10px 12px" : "12px 16px", textAlign:"center", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)" }}>
-              <p style={{ fontSize: isMobile ? "18px" : "22px", fontWeight:800, color:s.color, lineHeight:1 }}>{s.val}</p>
-              <p style={{ fontSize:"10px", color:"rgba(255,255,255,0.35)", marginTop:"3px" }}>{s.label}</p>
+        {/* Metric cards */}
+        <div style={{ display:"grid", gridTemplateColumns:`repeat(${isMobile ? 2 : 4}, 1fr)`, gap:"10px", marginBottom:"16px" }}>
+          {([
+            { label:"Total Applied",  val:apps.length,  sub:"all time",         color:"#a5b4fc", bg:"rgba(165,180,252,0.08)", border:"rgba(165,180,252,0.18)", Icon: Briefcase01 },
+            { label:"Active Pipeline",val:active,        sub:"in progress",      color:"#60a5fa", bg:"rgba(96,165,250,0.08)",  border:"rgba(96,165,250,0.18)",  Icon: ActivityHeart },
+            { label:"Offers",         val:offers,        sub:"received",         color:"#4ade80", bg:"rgba(74,222,128,0.08)",  border:"rgba(74,222,128,0.18)",  Icon: Star01 },
+            { label:"Response Rate",  val:`${rr}%`,      sub:"of applications",  color:"#fbbf24", bg:"rgba(251,191,36,0.08)",  border:"rgba(251,191,36,0.18)",  Icon: Percent01 },
+          ] as const).map(({ label, val, sub, color, bg, border, Icon }) => (
+            <div key={label} style={{
+              borderRadius:"14px", padding: isMobile ? "12px 14px" : "16px 18px",
+              background: bg, border:`1px solid ${border}`,
+              display:"flex", flexDirection:"column", gap:"10px",
+            }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                <span style={{ fontSize:"11px", fontWeight:600, color:"rgba(255,255,255,0.45)", letterSpacing:"0.03em" }}>{label}</span>
+                <div style={{ width:"28px", height:"28px", borderRadius:"8px", background:`${color}18`, border:`1px solid ${color}30`, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  <Icon size={14} style={{ color }} />
+                </div>
+              </div>
+              <div>
+                <p style={{ fontSize: isMobile ? "22px" : "28px", fontWeight:800, color, lineHeight:1, letterSpacing:"-0.02em" }}>{val}</p>
+                <p style={{ fontSize:"10px", color:"rgba(255,255,255,0.25)", marginTop:"3px" }}>{sub}</p>
+              </div>
             </div>
           ))}
         </div>

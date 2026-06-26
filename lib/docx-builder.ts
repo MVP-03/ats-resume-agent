@@ -11,7 +11,7 @@ export interface DocxResumeData {
   jobTitle?: string; summary?: string;
   skills?: string[];
   experiences?: { company: string; role: string; location?: string; duration: string; bullets: string[] }[];
-  education?: { school: string; degree: string; field?: string; location?: string; year: string; gpa?: string }[];
+  education?: { school: string; degree: string; field?: string; location?: string; year: string; gpa?: string; }[];
   projects?: { name: string; link?: string; tech?: string; bullets: string[] }[];
   certifications?: { name: string; issuer?: string; date?: string }[];
 }
