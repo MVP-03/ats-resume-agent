@@ -18,9 +18,8 @@ export async function POST(req: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const pdfParseModule = await import("pdf-parse") as any;
-    const pdfParse = pdfParseModule.default ?? pdfParseModule;
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const pdfParse = require("pdf-parse") as (buf: Buffer) => Promise<{ text: string }>;
     const data = await pdfParse(buffer);
 
     if (!data.text?.trim()) {
