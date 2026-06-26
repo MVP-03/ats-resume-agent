@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { resumeText, jobDescription, missingKeywords } = await req.json();
+    const { resumeText, jobDescription, missingKeywords, currentScore } = await req.json();
 
     if (!resumeText?.trim() || !jobDescription?.trim()) {
       return NextResponse.json(
@@ -64,7 +64,8 @@ Rules:
 - bulletFeedback: pick the 4-5 weakest bullets in the resume. Be specific and honest. The corrected field must use the candidate's real experience — never invent facts, use [X%] or [N] as placeholders for missing metrics.
 - powerVerbs: choose 8 strong verbs relevant to this specific job description.
 - summaryTip: one actionable sentence, not a rewrite.
-- scoreBefore and scorePotential: integers 0-100.
+- scoreBefore: use exactly ${currentScore ?? "the estimated current ATS score"} — do not change this value.
+- scorePotential: estimate how high the score could realistically reach if all your suggestions are applied. Must be higher than scoreBefore and no more than 95.
 - Return raw JSON only. No markdown, no code fences.`;
 
     const completion = await groq.chat.completions.create({
@@ -78,6 +79,8 @@ Rules:
     raw = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
 
     const parsed = JSON.parse(raw);
+    // Always use the real ATS score for scoreBefore — never trust the AI's guess
+    if (currentScore !== undefined) parsed.scoreBefore = currentScore;
     return NextResponse.json(parsed);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

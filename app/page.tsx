@@ -353,6 +353,7 @@ export default function Home() {
 
   const [step, setStep] = useState<Step>("home");
   const [tailorTab, setTailorTab] = useState<"coach" | "cover" | "hr">("coach");
+  const [editorTab, setEditorTab] = useState<"edit" | "preview">("edit");
   const [resumeText, setResumeText] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [scoreResult, setScoreResult] = useState<ScoreResult | null>(null);
@@ -637,7 +638,7 @@ export default function Home() {
     try {
       const res = await fetch("/api/tailor", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ resumeText, jobDescription, missingKeywords: scoreResult?.missingKeywords }),
+        body: JSON.stringify({ resumeText, jobDescription, missingKeywords: scoreResult?.missingKeywords, currentScore: scoreResult?.score }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -1307,184 +1308,271 @@ export default function Home() {
               )}
 
               {/* TAILOR */}
-              {step === "tailor" && tailorResult && (
-                <div style={{ display:"flex", flexDirection:"column", gap:"20px" }} className="animate-fadeUp">
-                  <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between" }}>
-                    <div>
-                      <h2 style={{ fontSize:"22px", fontWeight:800, color:"var(--t1)", marginBottom:"4px" }}>AI Coach</h2>
-                      <p style={{ fontSize:"13px", color:"var(--t2)" }}>Coaching, cover letter, and HR message.</p>
-                    </div>
-                    <div style={{ display:"flex", gap:"8px", flexWrap:"wrap", justifyContent:"flex-end" }}>
-                      <button onClick={handleDownloadDocx}
-                        style={{ display:"flex", alignItems:"center", gap:"6px", padding:"6px 14px", borderRadius:"9px",
-                          background:"linear-gradient(135deg,#2563eb,#4f46e5)", color:"#fff", fontWeight:600, fontSize:"12px", border:"none", cursor:"pointer" }}>
-                        Word (.docx)
-                      </button>
-                      <button onClick={reset} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
-                    </div>
-                  </div>
-                  <div className="card" style={{ padding:"20px", display:"flex", alignItems:"center", gap:"20px" }}>
-                    <div style={{ textAlign:"center", flexShrink:0 }}>
-                      <p style={{ fontSize:"11px", color:"var(--t3)", marginBottom:"4px" }}>Current</p>
-                      <p style={{ fontSize:"36px", fontWeight:800, color:"var(--red)", fontFamily:"var(--font-geist-mono)", lineHeight:1 }}>{tailorResult.scoreBefore}</p>
-                    </div>
-                    <div style={{ flex:1 }}>
-                      <div style={{ height:"8px", borderRadius:"99px", overflow:"hidden", background:"rgba(255,255,255,0.05)" }}>
-                        <div style={{ width:`${tailorResult.scorePotential}%`, height:"100%", borderRadius:"99px", background:"linear-gradient(90deg,var(--red),var(--yellow),var(--green))" }} className="animate-bar" />
+              {step === "tailor" && tailorResult && (() => {
+                const realScore = scoreResult?.score ?? tailorResult.scoreBefore;
+                const potential = tailorResult.scorePotential;
+                const gain = Math.max(0, potential - realScore);
+                const scoreCol = realScore >= 70 ? "var(--green)" : realScore >= 50 ? "var(--yellow)" : "var(--red)";
+                return (
+                  <div style={{ display:"flex", gap:"20px", minHeight:0 }} className="animate-fadeUp">
+
+                    {/* Left: coaching panel */}
+                    <div style={{ flex:"0 0 52%", display:"flex", flexDirection:"column", gap:"16px", minWidth:0 }}>
+
+                      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between" }}>
+                        <div>
+                          <h2 style={{ fontSize:"20px", fontWeight:800, color:"var(--t1)", marginBottom:"3px" }}>AI Coach</h2>
+                          <p style={{ fontSize:"12px", color:"var(--t2)" }}>Coaching, cover letter, and HR message.</p>
+                        </div>
+                        <div style={{ display:"flex", gap:"8px" }}>
+                          <button onClick={handleDownloadDocx}
+                            style={{ padding:"6px 14px", borderRadius:"9px", background:"linear-gradient(135deg,#2563eb,#4f46e5)", color:"#fff", fontWeight:600, fontSize:"12px", border:"none", cursor:"pointer" }}>
+                            Word (.docx)
+                          </button>
+                          <button onClick={reset} className="btn btn-ghost" style={{ padding:"6px 12px", fontSize:"12px" }}>Home</button>
+                        </div>
                       </div>
-                      <p style={{ fontSize:"12px", textAlign:"center", color:"var(--t2)", marginTop:"8px" }}>
-                        Apply all suggestions to reach {tailorResult.scorePotential}
-                      </p>
-                    </div>
-                    <div style={{ textAlign:"center", flexShrink:0 }}>
-                      <p style={{ fontSize:"11px", color:"var(--t3)", marginBottom:"4px" }}>Potential</p>
-                      <p style={{ fontSize:"36px", fontWeight:800, color:"var(--green)", fontFamily:"var(--font-geist-mono)", lineHeight:1 }}>{tailorResult.scorePotential}</p>
-                    </div>
-                  </div>
-                  <div className="tab-bar">
-                    {([
-                      { id:"coach" as const, label:"Coaching", icon:I.sparkle },
-                      { id:"cover" as const, label:"Cover Letter", icon:I.mail },
-                      { id:"hr"    as const, label:"HR Message", icon:I.send },
-                    ]).map((tab) => (
-                      <button key={tab.id} onClick={() => setTailorTab(tab.id)} className={`tab${tailorTab === tab.id ? " active" : ""}`}>
-                        {tab.icon} {tab.label}
-                      </button>
-                    ))}
-                  </div>
-                  {tailorTab === "coach" && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
-                      {tailorResult.summaryTip && (
-                        <div style={{ padding:"14px 16px", borderRadius:"10px", background:"rgba(124,58,237,0.08)", border:"1px solid rgba(124,58,237,0.2)" }}>
-                          <p style={{ fontSize:"10px", fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color:"#8b5cf6", marginBottom:"6px" }}>Summary Tip</p>
-                          <p style={{ fontSize:"13px", color:"var(--t1)", lineHeight:1.5 }}>{tailorResult.summaryTip}</p>
+
+                      {/* Score bar using real ATS score */}
+                      <div className="card" style={{ padding:"18px 20px" }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:"18px" }}>
+                          <div style={{ textAlign:"center", flexShrink:0, minWidth:"44px" }}>
+                            <p style={{ fontSize:"10px", color:"var(--t3)", marginBottom:"3px" }}>Current</p>
+                            <p style={{ fontSize:"32px", fontWeight:800, color:scoreCol, fontFamily:"var(--font-geist-mono)", lineHeight:1 }}>{realScore}</p>
+                          </div>
+                          <div style={{ flex:1, position:"relative" }}>
+                            <div style={{ height:"10px", borderRadius:"99px", overflow:"hidden", background:"rgba(255,255,255,0.06)", position:"relative" }}>
+                              <div style={{ position:"absolute", left:0, top:0, bottom:0, width:`${realScore}%`, background:scoreCol, opacity:0.35 }} />
+                              <div className="animate-bar" style={{ position:"absolute", left:`${realScore}%`, top:0, bottom:0, width:`${gain}%`, background:"linear-gradient(90deg, var(--yellow), var(--green))" }} />
+                            </div>
+                            <div style={{ position:"absolute", top:"-5px", left:`calc(${realScore}% - 1px)`, width:"2px", height:"20px", background:"white", borderRadius:"2px", opacity:0.7 }} />
+                            <p style={{ fontSize:"11px", textAlign:"center", color:"var(--t2)", marginTop:"10px" }}>
+                              {gain > 0 ? `Apply all suggestions to reach ${potential} (+${gain} pts)` : `Already at potential!`}
+                            </p>
+                          </div>
+                          <div style={{ textAlign:"center", flexShrink:0, minWidth:"44px" }}>
+                            <p style={{ fontSize:"10px", color:"var(--t3)", marginBottom:"3px" }}>Potential</p>
+                            <p style={{ fontSize:"32px", fontWeight:800, color:"var(--green)", fontFamily:"var(--font-geist-mono)", lineHeight:1 }}>{potential}</p>
+                          </div>
                         </div>
-                      )}
-                      {tailorResult.keywordSuggestions?.length > 0 && (
-                        <div className="card" style={{ padding:"18px" }}>
-                          <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)", marginBottom:"12px" }}>Missing Keywords to Add</p>
-                          <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
-                            {tailorResult.keywordSuggestions.map((k, i) => (
-                              <div key={i} style={{ padding:"12px", borderRadius:"8px", background:"var(--s2)", border:"1px solid var(--border)" }}>
-                                <span className="chip chip-violet" style={{ marginBottom:"8px", display:"inline-block" }}>{k.keyword}</span>
-                                <p style={{ fontSize:"12px", color:"var(--t2)", marginBottom:"4px" }}><span style={{ color:"var(--t1)", fontWeight:600 }}>Where: </span>{k.whereTo}</p>
-                                <p style={{ fontSize:"12px", color:"var(--t2)" }}><span style={{ color:"var(--t1)", fontWeight:600 }}>How: </span>{k.how}</p>
+                      </div>
+
+                      <div className="tab-bar">
+                        {([
+                          { id:"coach" as const, label:"Coaching", icon:I.sparkle },
+                          { id:"cover" as const, label:"Cover Letter", icon:I.mail },
+                          { id:"hr"    as const, label:"HR Message", icon:I.send },
+                        ]).map((tab) => (
+                          <button key={tab.id} onClick={() => setTailorTab(tab.id)} className={`tab${tailorTab === tab.id ? " active" : ""}`}>
+                            {tab.icon} {tab.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div style={{ overflowY:"auto", flex:1 }}>
+                        {tailorTab === "coach" && (
+                          <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
+                            {tailorResult.summaryTip && (
+                              <div style={{ padding:"14px 16px", borderRadius:"10px", background:"rgba(124,58,237,0.08)", border:"1px solid rgba(124,58,237,0.2)" }}>
+                                <p style={{ fontSize:"10px", fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", color:"#8b5cf6", marginBottom:"6px" }}>Summary Tip</p>
+                                <p style={{ fontSize:"13px", color:"var(--t1)", lineHeight:1.5 }}>{tailorResult.summaryTip}</p>
                               </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      {tailorResult.bulletFeedback?.length > 0 && (
-                        <div className="card" style={{ padding:"18px" }}>
-                          <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)", marginBottom:"14px" }}>Bullet Point Feedback</p>
-                          <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
-                            {tailorResult.bulletFeedback.map((b, i) => (
-                              <div key={i} style={{ padding:"14px", borderRadius:"8px", background:"var(--s2)", border:"1px solid var(--border)", display:"flex", flexDirection:"column", gap:"10px" }}>
-                                <p style={{ fontSize:"11px", fontStyle:"italic", color:"var(--t3)" }}>{b.original.slice(0, 120)}{b.original.length > 120 ? "..." : ""}</p>
-                                <div style={{ display:"flex", gap:"8px" }}>
-                                  <span style={{ fontSize:"10px", fontWeight:700, color:"var(--red)", flexShrink:0 }}>ISSUE</span>
-                                  <p style={{ fontSize:"12px", color:"var(--t2)" }}>{b.issue}</p>
+                            )}
+                            {tailorResult.keywordSuggestions?.length > 0 && (
+                              <div className="card" style={{ padding:"18px" }}>
+                                <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)", marginBottom:"12px" }}>Missing Keywords to Add</p>
+                                <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
+                                  {tailorResult.keywordSuggestions.map((k, i) => (
+                                    <div key={i} style={{ padding:"12px", borderRadius:"8px", background:"var(--s2)", border:"1px solid var(--border)" }}>
+                                      <span className="chip chip-violet" style={{ marginBottom:"8px", display:"inline-block" }}>{k.keyword}</span>
+                                      <p style={{ fontSize:"12px", color:"var(--t2)", marginBottom:"4px" }}><span style={{ color:"var(--t1)", fontWeight:600 }}>Where: </span>{k.whereTo}</p>
+                                      <p style={{ fontSize:"12px", color:"var(--t2)" }}><span style={{ color:"var(--t1)", fontWeight:600 }}>How: </span>{k.how}</p>
+                                    </div>
+                                  ))}
                                 </div>
-                                <div style={{ display:"flex", gap:"8px" }}>
-                                  <span style={{ fontSize:"10px", fontWeight:700, color:"var(--green)", flexShrink:0 }}>TIP</span>
-                                  <p style={{ fontSize:"12px", color:"var(--t2)" }}>{b.tip}</p>
-                                </div>
-                                {b.swapVerb && (
-                                  <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
-                                    <span style={{ fontSize:"10px", fontWeight:700, color:"var(--yellow)", flexShrink:0 }}>VERB</span>
-                                    <span className="chip chip-gray">{b.swapVerb}</span>
-                                  </div>
-                                )}
-                                {b.corrected && (
-                                  <div style={{ padding:"10px 12px", borderRadius:"6px", background:"rgba(16,185,129,0.06)", border:"1px solid rgba(16,185,129,0.18)" }}>
-                                    <p style={{ fontSize:"10px", fontWeight:700, color:"var(--green)", marginBottom:"4px" }}>REWRITE</p>
-                                    <p style={{ fontSize:"12px", color:"rgba(167,243,208,0.9)", lineHeight:1.6 }}>{b.corrected}</p>
-                                  </div>
-                                )}
                               </div>
-                            ))}
+                            )}
+                            {tailorResult.bulletFeedback?.length > 0 && (
+                              <div className="card" style={{ padding:"18px" }}>
+                                <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)", marginBottom:"14px" }}>Bullet Point Feedback</p>
+                                <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
+                                  {tailorResult.bulletFeedback.map((b, i) => (
+                                    <div key={i} style={{ padding:"14px", borderRadius:"8px", background:"var(--s2)", border:"1px solid var(--border)", display:"flex", flexDirection:"column", gap:"10px" }}>
+                                      <p style={{ fontSize:"11px", fontStyle:"italic", color:"var(--t3)" }}>{b.original.slice(0,120)}{b.original.length > 120 ? "..." : ""}</p>
+                                      <div style={{ display:"flex", gap:"8px" }}>
+                                        <span style={{ fontSize:"10px", fontWeight:700, color:"var(--red)", flexShrink:0 }}>ISSUE</span>
+                                        <p style={{ fontSize:"12px", color:"var(--t2)" }}>{b.issue}</p>
+                                      </div>
+                                      <div style={{ display:"flex", gap:"8px" }}>
+                                        <span style={{ fontSize:"10px", fontWeight:700, color:"var(--green)", flexShrink:0 }}>TIP</span>
+                                        <p style={{ fontSize:"12px", color:"var(--t2)" }}>{b.tip}</p>
+                                      </div>
+                                      {b.swapVerb && (
+                                        <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                                          <span style={{ fontSize:"10px", fontWeight:700, color:"var(--yellow)", flexShrink:0 }}>VERB</span>
+                                          <span className="chip chip-gray">{b.swapVerb}</span>
+                                        </div>
+                                      )}
+                                      {b.corrected && (
+                                        <div style={{ padding:"10px 12px", borderRadius:"6px", background:"rgba(16,185,129,0.06)", border:"1px solid rgba(16,185,129,0.18)" }}>
+                                          <p style={{ fontSize:"10px", fontWeight:700, color:"var(--green)", marginBottom:"4px" }}>REWRITE</p>
+                                          <p style={{ fontSize:"12px", color:"rgba(167,243,208,0.9)", lineHeight:1.6 }}>{b.corrected}</p>
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {tailorResult.powerVerbs?.length > 0 && (
+                              <div className="card" style={{ padding:"18px" }}>
+                                <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)", marginBottom:"12px" }}>Power Verbs for This Role</p>
+                                <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
+                                  {tailorResult.powerVerbs.map((v) => <span key={v} className="chip chip-violet">{v}</span>)}
+                                </div>
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      )}
-                      {tailorResult.powerVerbs?.length > 0 && (
-                        <div className="card" style={{ padding:"18px" }}>
-                          <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)", marginBottom:"12px" }}>Power Verbs for This Role</p>
-                          <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
-                            {tailorResult.powerVerbs.map((v) => <span key={v} className="chip chip-violet">{v}</span>)}
+                        )}
+                        {tailorTab === "cover" && (
+                          <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
+                            <div className="card" style={{ padding:"18px" }}>
+                              <p style={{ fontSize:"10px", fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--t3)", marginBottom:"14px" }}>Personalize</p>
+                              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"10px", marginBottom:"14px" }}>
+                                <div>
+                                  <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Your Name</label>
+                                  <input value={coverName} onChange={(e) => setCoverName(e.target.value)} placeholder="Jane Smith" className="field" style={{ padding:"8px 10px" }} />
+                                </div>
+                                <div>
+                                  <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Company</label>
+                                  <input value={coverCompany} onChange={(e) => setCoverCompany(e.target.value)} placeholder="Stripe" className="field" style={{ padding:"8px 10px" }} />
+                                </div>
+                                <div>
+                                  <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Role</label>
+                                  <input value={coverRole} onChange={(e) => setCoverRole(e.target.value)} placeholder="Senior SWE" className="field" style={{ padding:"8px 10px" }} />
+                                </div>
+                              </div>
+                              <button onClick={handleCoverLetter} disabled={coverLoading} className="btn btn-primary" style={{ padding:"10px 20px" }}>
+                                {coverLoading ? "Writing..." : "Generate Cover Letter"}
+                              </button>
+                            </div>
+                            {coverResult?.coverLetter && (
+                              <div className="card" style={{ padding:"18px" }}>
+                                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"12px" }}>
+                                  <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)" }}>Cover Letter</p>
+                                  <button onClick={() => copyText(coverResult.coverLetter, setCopiedCover)} className="btn btn-ghost" style={{ padding:"6px 10px", fontSize:"12px" }}>
+                                    {copiedCover ? "Copied" : "Copy"}
+                                  </button>
+                                </div>
+                                <div style={{ borderRadius:"8px", padding:"16px", background:"rgba(0,0,0,0.25)", border:"1px solid var(--border)" }}>
+                                  <pre style={{ whiteSpace:"pre-wrap", fontSize:"13px", color:"rgba(255,255,255,0.8)", fontFamily:"inherit", lineHeight:1.7 }}>{coverResult.coverLetter}</pre>
+                                </div>
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  {tailorTab === "cover" && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
-                      <div className="card" style={{ padding:"18px" }}>
-                        <p style={{ fontSize:"10px", fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase", color:"var(--t3)", marginBottom:"14px" }}>Personalize</p>
-                        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:"10px", marginBottom:"14px" }}>
-                          <div>
-                            <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Your Name</label>
-                            <input value={coverName} onChange={(e) => setCoverName(e.target.value)} placeholder="Jane Smith" className="field" style={{ padding:"8px 10px" }} />
+                        )}
+                        {tailorTab === "hr" && (
+                          <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
+                            {!coverResult?.hrMessage ? (
+                              <div className="card" style={{ padding:"24px", textAlign:"center" }}>
+                                <div style={{ width:"44px", height:"44px", borderRadius:"12px", background:"rgba(124,58,237,0.1)", border:"1px solid rgba(124,58,237,0.2)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 12px" }}>{I.send}</div>
+                                <p style={{ fontSize:"14px", fontWeight:600, color:"var(--t1)", marginBottom:"6px" }}>HR Follow-up Message</p>
+                                <p style={{ fontSize:"13px", color:"var(--t2)", marginBottom:"16px" }}>Generate the cover letter first — the HR message is included automatically.</p>
+                                <button onClick={() => setTailorTab("cover")} className="btn btn-primary" style={{ padding:"10px 20px" }}>Go to Cover Letter</button>
+                              </div>
+                            ) : (
+                              <div className="card" style={{ padding:"18px" }}>
+                                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"12px" }}>
+                                  <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)" }}>LinkedIn / HR Message</p>
+                                  <button onClick={() => copyText(coverResult.hrMessage, setCopiedHr)} className="btn btn-ghost" style={{ padding:"6px 10px", fontSize:"12px" }}>
+                                    {copiedHr ? "Copied" : "Copy"}
+                                  </button>
+                                </div>
+                                <div style={{ borderRadius:"8px", padding:"16px", background:"rgba(0,0,0,0.25)", border:"1px solid var(--border)" }}>
+                                  <pre style={{ whiteSpace:"pre-wrap", fontSize:"13px", color:"rgba(255,255,255,0.8)", fontFamily:"inherit", lineHeight:1.7 }}>{coverResult.hrMessage}</pre>
+                                </div>
+                              </div>
+                            )}
                           </div>
-                          <div>
-                            <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Company</label>
-                            <input value={coverCompany} onChange={(e) => setCoverCompany(e.target.value)} placeholder="Stripe" className="field" style={{ padding:"8px 10px" }} />
-                          </div>
-                          <div>
-                            <label style={{ display:"block", fontSize:"11px", fontWeight:600, color:"var(--t2)", marginBottom:"5px" }}>Role</label>
-                            <input value={coverRole} onChange={(e) => setCoverRole(e.target.value)} placeholder="Senior SWE" className="field" style={{ padding:"8px 10px" }} />
-                          </div>
-                        </div>
-                        <button onClick={handleCoverLetter} disabled={coverLoading} className="btn btn-primary" style={{ padding:"10px 20px" }}>
-                          {coverLoading ? "Writing..." : "Generate Cover Letter"}
+                        )}
+                      </div>
+
+                      <div style={{ display:"flex", gap:"10px", flexShrink:0 }}>
+                        <button onClick={() => setStep("score")} className="btn btn-ghost" style={{ padding:"12px 20px" }}>Back to Score</button>
+                        <button onClick={() => setShowSaveModal(true)} disabled={!canSave} className="btn btn-primary" style={{ flex:1, padding:"12px" }}>
+                          Save Application
                         </button>
                       </div>
-                      {coverResult?.coverLetter && (
-                        <div className="card" style={{ padding:"18px" }}>
-                          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"12px" }}>
-                            <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)" }}>Cover Letter</p>
-                            <button onClick={() => copyText(coverResult.coverLetter, setCopiedCover)} className="btn btn-ghost" style={{ padding:"6px 10px", fontSize:"12px" }}>
-                              {copiedCover ? "Copied" : "Copy"}
+                    </div>
+
+                    {/* Right: live resume editor */}
+                    <div style={{ flex:1, display:"flex", flexDirection:"column", minWidth:0, borderRadius:"14px", border:"1px solid var(--border)", overflow:"hidden" }}>
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:"var(--card)", borderBottom:"1px solid var(--border)", flexShrink:0 }}>
+                        <span style={{ fontSize:"12px", fontWeight:700, color:"var(--t1)" }}>Resume Editor</span>
+                        <div style={{ display:"flex", gap:"2px", background:"rgba(255,255,255,0.05)", borderRadius:"8px", padding:"2px" }}>
+                          {(["edit","preview"] as const).map(t => (
+                            <button key={t} onClick={() => setEditorTab(t)}
+                              style={{
+                                padding:"4px 12px", fontSize:"11px", fontWeight:600, borderRadius:"6px", border:"none", cursor:"pointer",
+                                background: editorTab === t ? "var(--accent)" : "none",
+                                color: editorTab === t ? "#fff" : "var(--t2)",
+                                transition:"all 0.15s",
+                              }}>
+                              {t === "edit" ? "✎ Edit" : "◻ Preview"}
                             </button>
-                          </div>
-                          <div style={{ borderRadius:"8px", padding:"16px", background:"rgba(0,0,0,0.25)", border:"1px solid var(--border)" }}>
-                            <pre style={{ whiteSpace:"pre-wrap", fontSize:"13px", color:"rgba(255,255,255,0.8)", fontFamily:"inherit", lineHeight:1.7 }}>{coverResult.coverLetter}</pre>
+                          ))}
+                        </div>
+                        <button onClick={handleScore}
+                          style={{ padding:"5px 11px", fontSize:"11px", fontWeight:600, borderRadius:"8px", border:"1px solid var(--border)", background:"none", color:"var(--t2)", cursor:"pointer" }}>
+                          ↻ Re-score
+                        </button>
+                      </div>
+                      {editorTab === "edit" && (
+                        <textarea
+                          value={resumeText}
+                          onChange={e => setResumeText(e.target.value)}
+                          spellCheck={false}
+                          style={{
+                            flex:1, resize:"none", border:"none", outline:"none",
+                            background:"var(--bg)", color:"var(--t1)",
+                            fontSize:"12px", lineHeight:1.7, fontFamily:"var(--font-geist-mono), monospace",
+                            padding:"16px", overflowY:"auto", minHeight:"400px",
+                          }}
+                        />
+                      )}
+                      {editorTab === "preview" && (
+                        <div style={{ flex:1, overflowY:"auto", background:"#4b5563", padding:"16px 12px", display:"flex", justifyContent:"center" }}>
+                          <div style={{
+                            background:"white", width:"100%", maxWidth:"580px",
+                            padding:"36px 44px", boxSizing:"border-box",
+                            fontFamily:"Calibri, 'Segoe UI', Arial, sans-serif",
+                            fontSize:"10pt", color:"#111", lineHeight:1.35,
+                            boxShadow:"0 4px 24px rgba(0,0,0,0.45)",
+                          }}>
+                            {resumeText.split("\n").map((line, i) => {
+                              const trimmed = line.trim();
+                              if (!trimmed) return <div key={i} style={{ height:"6px" }} />;
+                              const isHeader = /^[A-Z][A-Z\s/&]{3,}$/.test(trimmed) && trimmed.length < 40;
+                              const isBullet = trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*");
+                              if (isHeader) return (
+                                <div key={i} style={{ fontWeight:700, fontSize:"9.5pt", textTransform:"uppercase", borderBottom:"1px solid #222", paddingBottom:"1px", margin:"10px 0 5px", letterSpacing:"0.07em" }}>{trimmed}</div>
+                              );
+                              if (isBullet) return (
+                                <div key={i} style={{ display:"flex", gap:"6px", marginBottom:"2px", paddingLeft:"6px" }}>
+                                  <span style={{ flexShrink:0 }}>•</span>
+                                  <span style={{ fontSize:"9.5pt" }}>{trimmed.replace(/^[•\-*]\s*/, "")}</span>
+                                </div>
+                              );
+                              return <p key={i} style={{ fontSize:"9.5pt", marginBottom:"2px" }}>{line}</p>;
+                            })}
                           </div>
                         </div>
                       )}
                     </div>
-                  )}
-                  {tailorTab === "hr" && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
-                      {!coverResult?.hrMessage ? (
-                        <div className="card" style={{ padding:"24px", textAlign:"center" }}>
-                          <div style={{ width:"44px", height:"44px", borderRadius:"12px", background:"rgba(124,58,237,0.1)", border:"1px solid rgba(124,58,237,0.2)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 12px" }}>{I.send}</div>
-                          <p style={{ fontSize:"14px", fontWeight:600, color:"var(--t1)", marginBottom:"6px" }}>HR Follow-up Message</p>
-                          <p style={{ fontSize:"13px", color:"var(--t2)", marginBottom:"16px" }}>Generate the cover letter first � the HR message is included automatically.</p>
-                          <button onClick={() => setTailorTab("cover")} className="btn btn-primary" style={{ padding:"10px 20px" }}>Go to Cover Letter</button>
-                        </div>
-                      ) : (
-                        <div className="card" style={{ padding:"18px" }}>
-                          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"12px" }}>
-                            <p style={{ fontSize:"13px", fontWeight:700, color:"var(--t1)" }}>LinkedIn / HR Message</p>
-                            <button onClick={() => copyText(coverResult.hrMessage, setCopiedHr)} className="btn btn-ghost" style={{ padding:"6px 10px", fontSize:"12px" }}>
-                              {copiedHr ? "Copied" : "Copy"}
-                            </button>
-                          </div>
-                          <div style={{ borderRadius:"8px", padding:"16px", background:"rgba(0,0,0,0.25)", border:"1px solid var(--border)" }}>
-                            <pre style={{ whiteSpace:"pre-wrap", fontSize:"13px", color:"rgba(255,255,255,0.8)", fontFamily:"inherit", lineHeight:1.7 }}>{coverResult.hrMessage}</pre>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  <div style={{ display:"flex", gap:"10px" }}>
-                    <button onClick={() => setStep("score")} className="btn btn-ghost" style={{ padding:"12px 20px" }}>Back to Score</button>
-                    <button onClick={() => setShowSaveModal(true)} disabled={!canSave} className="btn btn-primary" style={{ flex:1, padding:"12px" }}>
-                      Save Application
-                    </button>
+
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
             </div>
           )}
