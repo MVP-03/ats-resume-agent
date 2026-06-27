@@ -13,6 +13,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} dark`}>
+      <head>
+        <script src="https://tweakcn.com/live-preview.min.js"></script>
+      </head>
       <body className="min-h-screen">{children}</body>
     </html>
   );
